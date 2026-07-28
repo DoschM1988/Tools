@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TM-Rechner Doschhof</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ============ Grundgerüst ============ */
+  :root {
+    --green: #83B735;
+    --green-dark: #2F5D2F;
+    --cream: #FCFAF5;
+    --line: #E3E0D6;
+    --text: #263427;
+    --muted: #7A8577;
+    --warn: #C77B1E;
+    --danger: #B94A3B;
+    --ok-bg: #EEF5E3;
+    --warn-bg: #FBF1E2;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, 'Segoe UI', Arial, sans-serif;
+    background: var(--cream);
+    margin: 0;
+    padding: 24px 14px 40px;
+    color: var(--text);
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+
+  /* ============ Kopf ============ */
+  .head { margin-bottom: 18px; }
+  .head h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--green-dark);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .head span {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--green);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    margin-bottom: 18px;
+    line-height: 1.45;
+  }
+  .hint b { color: var(--green-dark); }
+
+  /* ============ Proben-Karten ============ */
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 18px 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 2px rgba(47,93,47,0.05);
+  }
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .probe-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green-dark);
+    color: #fff;
+    font-weight: 700;
+    font-size: 12.5px;
+    padding: 5px 12px 5px 10px;
+    border-radius: 999px;
+  }
+  .probe-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  .fields { display: flex; flex-direction: column; gap: 14px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; }
+  .row2 .field input, .row2 .field select { margin-top: auto; }
+  .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  input, select {
+    font-family: inherit;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 12px;
+    font-size: 16px; /* verhindert iOS-Auto-Zoom */
+    color: var(--text);
+    background: var(--cream);
+    width: 100%;
+    min-width: 0;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%237A8577' stroke-width='2' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 34px;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--green);
+    background: #fff;
+  }
+  .num { text-align: right; }
+
+  /* ============ Ergebnis pro Probe ============ */
+  .result {
+    margin-top: 14px;
+    border-radius: 10px;
+    padding: 14px;
+    display: none;
+  }
+  .result.show { display: block; }
+  .result.ok { background: var(--ok-bg); border: 1px solid #CFE0B5; }
+  .result.off { background: var(--warn-bg); border: 1px solid #EBD4AE; }
+  .result .tm {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--green-dark);
+    line-height: 1.1;
+  }
+  .result.off .tm { color: var(--warn); }
+  .result .verdict { font-size: 13.5px; font-weight: 600; margin-top: 4px; }
+  .result.ok .verdict { color: var(--green-dark); }
+  .result.off .verdict { color: var(--warn); }
+  .result .range { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+  /* ============ Durchschnitt ============ */
+  .avg-box {
+    background: var(--green-dark);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    color: #fff;
+  }
+  .avg-inner { text-align: center; }
+  .avg-label { font-size: 12.5px; font-weight: 600; opacity: 0.85; }
+  .avg-label span { opacity: 1; }
+  .avg-tm { font-size: 30px; font-weight: 800; line-height: 1.15; margin-top: 2px; }
+  .avg-verdict { font-size: 13px; font-weight: 600; margin-top: 2px; opacity: 0.9; }
+
+  /* ============ TMA ============ */
+  .tma-toggle {
+    display: flex; align-items: center; gap: 12px;
+    background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 14px 16px; margin-bottom: 14px; cursor: pointer;
+  }
+  .tma-toggle input {
+    -webkit-appearance: auto; appearance: auto;
+    width: 22px; height: 22px; accent-color: var(--green);
+    flex: none; margin: 0; padding: 0; border: none; background: none; border-radius: 0;
+  }
+  .tma-toggle .t-txt { font-size: 14.5px; font-weight: 700; color: var(--text); }
+  .tma-toggle .t-sub { font-size: 12px; font-weight: 500; color: var(--muted); margin-top: 1px; }
+  .tma-toggle.disabled { opacity: 0.55; cursor: not-allowed; }
+  .tma-toggle.disabled input { cursor: not-allowed; }
+
+  .tma-basis {
+    font-size: 12.5px; color: var(--muted); background: var(--cream);
+    border: 1px dashed var(--line); border-radius: 8px; padding: 9px 11px; margin-bottom: 14px;
+  }
+  .tma-basis b { color: var(--green-dark); }
+  .tma-missing {
+    font-size: 13.5px; color: var(--warn); background: var(--warn-bg);
+    border: 1px solid #EBD4AE; border-radius: 8px; padding: 10px 12px;
+  }
+  .tma-total-label { font-size: 12.5px; font-weight: 600; color: var(--muted); }
+  .tma-total { font-size: 30px; font-weight: 800; line-height: 1.15; color: var(--green-dark); margin-bottom: 12px; }
+  .result.off .tma-total { color: var(--warn); }
+  .breakdown { list-style: none; margin: 0 0 10px; padding: 0; }
+  .breakdown li {
+    display: flex; justify-content: space-between; gap: 12px;
+    font-size: 13.5px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .breakdown li:last-child { border-bottom: none; }
+  .breakdown .lbl { color: var(--muted); }
+  .breakdown .val { font-weight: 700; }
+
+  /* ============ Senden ============ */
+  .send-box {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .send-box .to { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+  .send-box .to b { color: var(--text); }
+  button {
+    font-family: inherit;
+    border: none;
+    padding: 13px 18px;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    background: var(--green);
+    color: #fff;
+    transition: transform .08s ease, background .15s ease;
+  }
+  button:active { transform: scale(0.98); }
+  button:hover { background: var(--green-dark); }
+
+  /* ============ Desktop ============ */
+  @media (min-width: 700px) {
+    body { padding: 36px 20px 50px; }
+    .head h1 { font-size: 25px; }
+    .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .card { margin-bottom: 0; }
+    .cards { margin-bottom: 14px; }
+    button { width: auto; }
+    .send-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .send-box .to { margin-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <h1>TM-Rechner</h1>
+    <span>Doschhof &middot; Trockenmasse-Bestimmung</span>
+  </div>
+
+  <div class="hint">
+    <div>&#9432;</div>
+    <div><b>Trocknungszeit: 45 Minuten.</b> Probe einwiegen, 45&nbsp;Min. trocknen, zurückwiegen &ndash; Einwaage und Auswaage unten eintragen, der TM-Gehalt wird sofort berechnet.</div>
+  </div>
+
+  <div class="cards">
+    <!-- Probe 1 -->
+    <div class="card" id="probe1">
+      <div class="card-top">
+        <span class="probe-badge"><span class="dot"></span>Probe 1</span>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <label>Futtersorte</label>
+          <select class="sorte" onchange="calc(1)">
+            <option value="">Bitte wählen ...</option>
+            <option value="Grassilage">Grassilage</option>
+            <option value="Maissilage">Maissilage</option>
+            <option value="TMR Milchvieh">TMR Milchvieh</option>
+            <option value="TMR Trockensteher">TMR Trockensteher</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Einwaage (g)</label>
+            <input type="number" inputmode="decimal" step="0.1" min="0" class="einwaage num" oninput="calc(1)" placeholder="0,0">
+          </div>
+          <div class="field">
+            <label>Auswaage (g)</label>
+            <input type="number" inputmode="decimal" step="0.1" min="0" class="auswaage num" oninput="calc(1)" placeholder="0,0">
+          </div>
+        </div>
+      </div>
+      <div class="result" id="result1">
+        <div class="tm" id="tm1">–</div>
+        <div class="verdict" id="verdict1"></div>
+        <div class="range" id="range1"></div>
+      </div>
+    </div>
+
+    <!-- Probe 2 -->
+    <div class="card" id="probe2">
+      <div class="card-top">
+        <span class="probe-badge"><span class="dot"></span>Probe 2 <span style="font-weight:500;opacity:.75;">(optional)</span></span>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <label>Futtersorte</label>
+          <select class="sorte" onchange="calc(2)">
+            <option value="">Bitte wählen ...</option>
+            <option value="Grassilage">Grassilage</option>
+            <option value="Maissilage">Maissilage</option>
+            <option value="TMR Milchvieh">TMR Milchvieh</option>
+            <option value="TMR Trockensteher">TMR Trockensteher</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Einwaage (g)</label>
+            <input type="number" inputmode="decimal" step="0.1" min="0" class="einwaage num" oninput="calc(2)" placeholder="0,0">
+          </div>
+          <div class="field">
+            <label>Auswaage (g)</label>
+            <input type="number" inputmode="decimal" step="0.1" min="0" class="auswaage num" oninput="calc(2)" placeholder="0,0">
+          </div>
+        </div>
+      </div>
+      <div class="result" id="result2">
+        <div class="tm" id="tm2">–</div>
+        <div class="verdict" id="verdict2"></div>
+        <div class="range" id="range2"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="avg-box" id="avgBox" style="display:none;">
+    <div class="avg-inner">
+      <div class="avg-label">Durchschnitt beider Proben <span id="avgSorte"></span></div>
+      <div class="avg-tm" id="avgTm">–</div>
+      <div class="avg-verdict" id="avgVerdict"></div>
+    </div>
+  </div>
+
+  <!-- TMA-Umschalter -->
+  <label class="tma-toggle" id="tmaToggleWrap">
+    <input type="checkbox" id="tmaToggle" onchange="toggleTMA()">
+    <div>
+      <div class="t-txt">Trockenmasseaufnahme (TMA) berechnen</div>
+      <div class="t-sub" id="tmaToggleSub">je Tier und Tag &ndash; auf Basis der Messung oben</div>
+    </div>
+  </label>
+
+  <!-- TMA-Bereich -->
+  <div id="tmaArea" style="display:none;">
+    <div class="card">
+      <div class="card-top">
+        <span class="probe-badge"><span class="dot"></span>TMA je Tier &amp; Tag</span>
+      </div>
+
+      <div id="tmaMissing" class="tma-missing" style="display:none;">
+        Bitte zuerst oben eine Probe messen &ndash; daraus wird der TM-Gehalt übernommen.
+      </div>
+
+      <div id="tmaBody">
+        <div class="tma-basis" id="tmaBasis"></div>
+        <div class="fields">
+          <div class="row2">
+            <div class="field">
+              <label>Futtervorlage (kg)</label>
+              <input type="number" inputmode="decimal" step="0.1" min="0" id="vorlage" class="num" oninput="updateTMA()" placeholder="0">
+            </div>
+            <div class="field">
+              <label>Restfutter (kg)</label>
+              <input type="number" inputmode="decimal" step="0.1" min="0" id="rest" class="num" oninput="updateTMA()" placeholder="0">
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Anzahl Tiere</label>
+              <input type="number" inputmode="numeric" step="1" min="0" id="tiere" class="num" oninput="updateTMA()" placeholder="0">
+            </div>
+            <div class="field" id="kraftfutterField" style="display:none;">
+              <label>Kraftfutter gesamt (kg/Tag)</label>
+              <input type="number" inputmode="decimal" step="0.1" min="0" id="kraftfutter" class="num" oninput="updateTMA()" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="result" id="tmaResult">
+          <div class="tma-total-label">Gesamt-TMA je Tier &amp; Tag</div>
+          <div class="tma-total" id="tmaTotal">&ndash;</div>
+          <ul class="breakdown" id="tmaBreakdown"></ul>
+          <div class="verdict" id="tmaVerdict"></div>
+          <div class="range" id="tmaRange"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="send-box">
+    <div class="send-row">
+      <div class="to">Ergebnis wird gesendet an: <b>fuetterung@dosch-hof.de</b></div>
+      <button onclick="sendMail()">Ergebnis per E-Mail senden</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+
+/* ============ Konfiguration ============ */
+const MAIL_TO = 'fuetterung@dosch-hof.de';
+const TROCKNUNGSZEIT = '45 Minuten';
+
+/* Optimalbereiche TM in % je Futtersorte */
+const OPTIMAL = {
+  'Grassilage':        { min: 30, max: 40 },
+  'Maissilage':        { min: 30, max: 35 },
+  'TMR Milchvieh':     { min: 38, max: 42 },
+  'TMR Trockensteher': { min: 33, max: 44 }
+};
+
+/* ============ Hilfsfunktionen ============ */
+function probeEl(n)  { return document.getElementById('probe' + n); }
+
+function fmtPct(v) {
+  return v.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %';
+}
+
+function readProbe(n) {
+  const p = probeEl(n);
+  const sorte = p.querySelector('.sorte').value;
+  const ein = parseFloat(p.querySelector('.einwaage').value) || 0;
+  const aus = parseFloat(p.querySelector('.auswaage').value) || 0;
+  const tm = (ein > 0 && aus > 0) ? (aus / ein) * 100 : null;
+  return { sorte, ein, aus, tm };
+}
+
+/* ============ Berechnung & Anzeige ============ */
+function calc(n) {
+  const { sorte, ein, aus, tm } = readProbe(n);
+  const box = document.getElementById('result' + n);
+  const tmEl = document.getElementById('tm' + n);
+  const verdictEl = document.getElementById('verdict' + n);
+  const rangeEl = document.getElementById('range' + n);
+
+  if (tm === null) {
+    box.classList.remove('show', 'ok', 'off');
+    updateAvg();
+    return;
+  }
+
+  box.classList.add('show');
+  tmEl.textContent = 'TM: ' + fmtPct(tm);
+
+  /* Plausibilität: Auswaage > Einwaage ergibt >100 % */
+  if (tm > 100) {
+    box.classList.remove('ok');
+    box.classList.add('off');
+    verdictEl.textContent = 'Auswaage ist größer als Einwaage – bitte Werte prüfen.';
+    rangeEl.textContent = '';
+    updateAvg();
+    return;
+  }
+
+  const opt = OPTIMAL[sorte] || null;
+  if (!opt) {
+    box.classList.remove('off');
+    box.classList.add('ok');
+    verdictEl.textContent = sorte ? 'Kein Richtwert für diese Sorte hinterlegt.' : 'Futtersorte wählen für Einordnung.';
+    rangeEl.textContent = '';
+    updateAvg();
+    return;
+  }
+
+  rangeEl.textContent = `Optimalbereich ${sorte}: ${opt.min}–${opt.max} % TM`;
+
+  if (tm < opt.min) {
+    box.classList.remove('ok'); box.classList.add('off');
+    verdictEl.textContent = 'Unter dem Optimalbereich – Futter ist zu nass.';
+  } else if (tm > opt.max) {
+    box.classList.remove('ok'); box.classList.add('off');
+    verdictEl.textContent = 'Über dem Optimalbereich – Futter ist zu trocken.';
+  } else {
+    box.classList.remove('off'); box.classList.add('ok');
+    verdictEl.textContent = 'Im Optimalbereich.';
+  }
+  updateAvg();
+}
+
+/* ============ Durchschnitt beider Proben ============ */
+function updateAvg() {
+  const p1 = readProbe(1);
+  const p2 = readProbe(2);
+  const box = document.getElementById('avgBox');
+
+  /* Nur zeigen, wenn beide Proben gültig UND gleiche Futtersorte */
+  const beideGueltig = p1.tm !== null && p2.tm !== null && p1.tm <= 100 && p2.tm <= 100;
+  const gleicheSorte = p1.sorte && p1.sorte === p2.sorte;
+
+  if (!beideGueltig || !gleicheSorte) {
+    box.style.display = 'none';
+    return;
+  }
+
+  const avg = (p1.tm + p2.tm) / 2;
+  box.style.display = 'block';
+  document.getElementById('avgSorte').textContent = `(${p1.sorte})`;
+  document.getElementById('avgTm').textContent = 'TM: ' + fmtPct(avg);
+
+  const opt = OPTIMAL[p1.sorte];
+  const vEl = document.getElementById('avgVerdict');
+  if (opt) {
+    if (avg < opt.min) vEl.textContent = `Zu nass · Optimal ${opt.min}–${opt.max} %`;
+    else if (avg > opt.max) vEl.textContent = `Zu trocken · Optimal ${opt.min}–${opt.max} %`;
+    else vEl.textContent = `Im Optimalbereich · ${opt.min}–${opt.max} %`;
+  } else {
+    vEl.textContent = '';
+  }
+  updateTmaAvailability();
+  updateTMA();
+}
+
+/* ============ TMA (Trockenmasseaufnahme je Tier & Tag) ============ */
+const TMA_OPTIMAL = {
+  'TMR Milchvieh':     { min: 19, max: 21, mehrGut: true  },
+  'TMR Trockensteher': { min: 12, max: 15, mehrGut: false }
+};
+
+/* TM-Gehalt von Kraftfutter (Frischmasse -> Trockenmasse) */
+const KRAFTFUTTER_TM = 0.88;
+
+function istTMR(s) { return s === 'TMR Milchvieh' || s === 'TMR Trockensteher'; }
+
+/* TMA nur möglich bei TMR; bei zwei Proben nur wenn gleiche TMR-Sorte */
+function tmaMoeglich() {
+  const p1 = readProbe(1);
+  const p2 = readProbe(2);
+  const v1 = p1.tm !== null && p1.tm <= 100;
+  const v2 = p2.tm !== null && p2.tm <= 100;
+  if (v1 && v2) return istTMR(p1.sorte) && p1.sorte === p2.sorte;
+  if (v1) return istTMR(p1.sorte);
+  if (v2) return istTMR(p2.sorte);
+  return false;
+}
+
+/* Haken freigeben/sperren je nach Eignung */
+function updateTmaAvailability() {
+  const moeglich = tmaMoeglich();
+  const toggle = document.getElementById('tmaToggle');
+  const wrap = document.getElementById('tmaToggleWrap');
+  const sub = document.getElementById('tmaToggleSub');
+
+  toggle.disabled = !moeglich;
+  wrap.classList.toggle('disabled', !moeglich);
+  sub.textContent = moeglich
+    ? 'je Tier und Tag – auf Basis der Messung oben'
+    : 'Nur für TMR (Milchvieh/Milchvieh oder Trockensteher/Trockensteher)';
+
+  if (!moeglich && toggle.checked) {
+    toggle.checked = false;
+    document.getElementById('tmaArea').style.display = 'none';
+  }
+}
+
+function fmtKg(v) {
+  return v.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' kg';
+}
+
+/* Welche TM-Messung wird zugrunde gelegt? Durchschnitt, wenn beide Proben gleiche Sorte. */
+function referenzMessung() {
+  const p1 = readProbe(1);
+  const p2 = readProbe(2);
+  const v1 = p1.tm !== null && p1.tm <= 100;
+  const v2 = p2.tm !== null && p2.tm <= 100;
+  if (v1 && v2 && p1.sorte && p1.sorte === p2.sorte)
+    return { tm: (p1.tm + p2.tm) / 2, sorte: p1.sorte, quelle: 'Durchschnitt beider Proben' };
+  if (v1) return { tm: p1.tm, sorte: p1.sorte, quelle: 'Probe 1' };
+  if (v2) return { tm: p2.tm, sorte: p2.sorte, quelle: 'Probe 2' };
+  return null;
+}
+
+function toggleTMA() {
+  const toggle = document.getElementById('tmaToggle');
+  if (toggle.checked && !tmaMoeglich()) { toggle.checked = false; return; }
+  document.getElementById('tmaArea').style.display = toggle.checked ? 'block' : 'none';
+  if (toggle.checked) updateTMA();
+}
+
+function tmaWerte() {
+  const ref = referenzMessung();
+  const vorlage = parseFloat(document.getElementById('vorlage').value) || 0;
+  const rest    = parseFloat(document.getElementById('rest').value) || 0;
+  const tiere   = parseFloat(document.getElementById('tiere').value) || 0;
+  const istMV   = !!ref && ref.sorte === 'TMR Milchvieh';
+  const kf      = istMV ? (parseFloat(document.getElementById('kraftfutter').value) || 0) : 0;
+  const frisch  = vorlage - rest;
+  const rechenbar = ref && tiere > 0 && frisch > 0;
+  let tmaRation = 0, kfProTier = 0, gesamt = 0;
+  if (rechenbar) {
+    tmaRation = frisch * (ref.tm / 100) / tiere;
+    kfProTier = istMV ? (kf * KRAFTFUTTER_TM) / tiere : 0;
+    gesamt    = tmaRation + kfProTier;
+  }
+  return { ref, vorlage, rest, tiere, istMV, kf, frisch, tmaRation, kfProTier, gesamt, rechenbar };
+}
+
+function updateTMA() {
+  if (!document.getElementById('tmaToggle').checked) return;
+  const ref = referenzMessung();
+
+  if (!ref) {
+    document.getElementById('tmaMissing').style.display = 'block';
+    document.getElementById('tmaBody').style.display = 'none';
+    return;
+  }
+  document.getElementById('tmaMissing').style.display = 'none';
+  document.getElementById('tmaBody').style.display = 'block';
+
+  const istMV = ref.sorte === 'TMR Milchvieh';
+  document.getElementById('kraftfutterField').style.display = istMV ? 'flex' : 'none';
+  document.getElementById('tmaBasis').innerHTML =
+    `TM-Grundlage: <b>${fmtPct(ref.tm)}</b> &middot; ${ref.sorte} (${ref.quelle})`;
+
+  const w = tmaWerte();
+  const box = document.getElementById('tmaResult');
+  if (!w.rechenbar) {
+    box.classList.remove('show', 'ok', 'off');
+    return;
+  }
+
+  box.classList.add('show');
+  let items =
+    `<li><span class="lbl">Gefressene Frischmasse</span><span class="val">${fmtKg(w.frisch)}</span></li>` +
+    `<li><span class="lbl">TMA aus Ration je Tier</span><span class="val">${fmtKg(w.tmaRation)}</span></li>`;
+  if (w.istMV && w.kf > 0)
+    items += `<li><span class="lbl">Kraftfutter je Tier (88&nbsp;% TM)</span><span class="val">${fmtKg(w.kfProTier)}</span></li>`;
+  document.getElementById('tmaBreakdown').innerHTML = items;
+  document.getElementById('tmaTotal').textContent = fmtKg(w.gesamt) + ' /Tier';
+
+  const opt = TMA_OPTIMAL[ref.sorte];
+  const verdictEl = document.getElementById('tmaVerdict');
+  const rangeEl = document.getElementById('tmaRange');
+  if (opt) {
+    rangeEl.textContent = `Zielbereich ${ref.sorte}: ${opt.min}–${opt.max} kg TM/Tier`;
+    if (w.gesamt < opt.min) {
+      box.classList.remove('ok'); box.classList.add('off');
+      verdictEl.textContent = 'Unter dem Zielbereich – Aufnahme zu niedrig.';
+    } else if (w.gesamt > opt.max) {
+      if (opt.mehrGut) {
+        box.classList.remove('off'); box.classList.add('ok');
+        verdictEl.textContent = 'Über dem Zielbereich – bei Milchvieh gut.';
+      } else {
+        box.classList.remove('ok'); box.classList.add('off');
+        verdictEl.textContent = 'Über dem Zielbereich.';
+      }
+    } else {
+      box.classList.remove('off'); box.classList.add('ok');
+      verdictEl.textContent = 'Im Zielbereich.';
+    }
+  } else {
+    rangeEl.textContent = 'Kein TMA-Zielbereich für diese Sorte hinterlegt.';
+    verdictEl.textContent = '';
+    box.classList.remove('off'); box.classList.add('ok');
+  }
+}
+
+/* ============ E-Mail-Versand ============ */
+function sendMail() {
+  const p1 = readProbe(1);
+  const p2 = readProbe(2);
+
+  if (p1.tm === null && p2.tm === null) {
+    alert('Bitte mindestens eine Probe vollständig eingeben.');
+    return;
+  }
+
+  const heute = new Date().toLocaleDateString('de-DE');
+  const uhrzeit = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+  let body = `TM-Messung Doschhof\n`
+           + `========================\n`
+           + `Datum: ${heute}, ${uhrzeit} Uhr\n`
+           + `Trocknungszeit: ${TROCKNUNGSZEIT}\n\n`;
+
+  /* Lesbarer Teil */
+  [p1, p2].forEach((p, i) => {
+    if (p.tm === null) return;
+    body += `--- Probe ${i + 1} ---\n`
+          + `Futtersorte:  ${p.sorte || '-'}\n`
+          + `Einwaage:     ${p.ein} g\n`
+          + `Auswaage:     ${p.aus} g\n`
+          + `TM-Gehalt:    ${fmtPct(p.tm)}\n`;
+    const opt = OPTIMAL[p.sorte];
+    if (opt) {
+      const status = p.tm < opt.min ? 'zu nass' : (p.tm > opt.max ? 'zu trocken' : 'im Optimalbereich');
+      body += `Optimalbereich: ${opt.min}-${opt.max} % (${status})\n`;
+    }
+    body += `\n`;
+  });
+
+  /* Durchschnitt, wenn beide Proben gleiche Sorte haben */
+  if (p1.tm !== null && p2.tm !== null && p1.tm <= 100 && p2.tm <= 100 && p1.sorte && p1.sorte === p2.sorte) {
+    const avg = (p1.tm + p2.tm) / 2;
+    body += `--- Durchschnitt (${p1.sorte}) ---\n`
+          + `TM-Gehalt: ${fmtPct(avg)}\n`;
+    const opt = OPTIMAL[p1.sorte];
+    if (opt) {
+      const status = avg < opt.min ? 'zu nass' : (avg > opt.max ? 'zu trocken' : 'im Optimalbereich');
+      body += `Optimalbereich: ${opt.min}-${opt.max} % (${status})\n`;
+    }
+    body += `\n`;
+  }
+
+  /* TMA, wenn aktiviert und rechenbar */
+  if (document.getElementById('tmaToggle').checked) {
+    const w = tmaWerte();
+    if (w.rechenbar) {
+      body += `--- TMA je Tier & Tag ---\n`
+            + `TM-Grundlage:   ${fmtPct(w.ref.tm)} (${w.ref.sorte}, ${w.ref.quelle})\n`
+            + `Futtervorlage:  ${w.vorlage} kg\n`
+            + `Restfutter:     ${w.rest} kg\n`
+            + `Anzahl Tiere:   ${w.tiere}\n`;
+      if (w.istMV) body += `Kraftfutter:    ${w.kf} kg/Tag gesamt, 88 % TM (${fmtKg(w.kfProTier)}/Tier)\n`;
+      body += `TMA aus Ration: ${fmtKg(w.tmaRation)}/Tier\n`
+            + `Gesamt-TMA:     ${fmtKg(w.gesamt)}/Tier\n`;
+      const opt = TMA_OPTIMAL[w.ref.sorte];
+      if (opt) {
+        let st;
+        if (w.gesamt < opt.min) st = 'unter Zielbereich';
+        else if (w.gesamt > opt.max) st = opt.mehrGut ? 'über Zielbereich (gut)' : 'über Zielbereich';
+        else st = 'im Zielbereich';
+        body += `Zielbereich:    ${opt.min}-${opt.max} kg (${st})\n`;
+      }
+      body += `\n`;
+    }
+  }
+  body += `------------------------\n`;
+  body += `Für Excel (Zeilen markieren, kopieren, in Excel einfügen):\n\n`;
+  body += `Datum\tUhrzeit\tProbe\tFuttersorte\tEinwaage (g)\tAuswaage (g)\tTM (%)\n`;
+  [p1, p2].forEach((p, i) => {
+    if (p.tm === null) return;
+    body += `${heute}\t${uhrzeit}\t${i + 1}\t${p.sorte || '-'}\t${p.ein}\t${p.aus}\t${p.tm.toFixed(1).replace('.', ',')}\n`;
+  });
+
+  const subject = encodeURIComponent(`TM-Messung Doschhof ${heute}`);
+  window.location.href = `mailto:${MAIL_TO}?subject=${subject}&body=${encodeURIComponent(body)}`;
+}
+
+/* Startzustand: Haken passend sperren */
+updateTmaAvailability();
+</script>
+</body>
+</html>
