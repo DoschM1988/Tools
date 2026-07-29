@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>A. Simeth · Materialerfassung</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root{
+    --bg:#F7F7F5;
+    --card:#FFFFFF;
+    --ink:#18181B;
+    --muted:#6E6E73;
+    --line:#E7E7E3;
+    --line-2:#DDDDD8;
+    --accent:#E24B43;
+    --accent-soft:#FBEDEC;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.45;padding-bottom:150px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-variant-numeric:tabular-nums;}
+
+  /* Header / Logo */
+  header{
+    background:var(--card);border-bottom:1px solid var(--line);
+    padding:10px 16px 15px;position:relative;
+  }
+  .toprow{display:flex;align-items:center;height:26px;}
+  .kw{
+    font-size:12px;font-weight:700;color:var(--ink);
+    background:#EFEFEA;border:1px solid var(--line-2);padding:3px 10px;border-radius:20px;
+  }
+  .gear{margin-left:auto;background:none;border:none;font-size:19px;color:var(--muted);cursor:pointer;padding:2px 4px;}
+  .logo{display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:1px;}
+  .logo svg{width:184px;height:auto;display:block;margin-bottom:-3px;}
+  .logo .wm{font-weight:800;font-size:27px;letter-spacing:-.5px;color:var(--accent);line-height:1;}
+  .logo .st{font-weight:600;font-size:11px;letter-spacing:.2px;color:var(--accent);margin-top:3px;}
+  .logo .addr{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.2px;}
+
+  main{max-width:620px;margin:0 auto;padding:16px 14px 0;}
+
+  .label{
+    font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+    color:var(--muted);margin:6px 4px 8px;
+  }
+
+  /* Eingabe-Karte */
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:12px;box-shadow:0 1px 2px rgba(0,0,0,.03);
+  }
+  .fieldset{display:flex;flex-direction:column;gap:9px;}
+  select,input[type=text]{
+    width:100%;border:1px solid var(--line-2);border-radius:9px;
+    padding:13px 12px;font-size:16px;background:#FCFCFB;color:var(--ink);
+    -webkit-appearance:none;appearance:none;
+  }
+  select{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%236E6E73' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;
+  }
+  input:focus,select:focus{outline:none;border-color:var(--ink);background:#fff;}
+  .qtyrow{display:flex;gap:9px;}
+  .qtyrow .qty{width:78px;text-align:center;font-weight:700;}
+  .qtyrow .unit{flex:1;}
+  .add{
+    width:100%;background:var(--ink);color:#fff;border:none;border-radius:9px;
+    padding:14px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.2px;
+    margin-top:2px;display:flex;align-items:center;justify-content:center;gap:7px;
+  }
+  .add:active{background:#000;}
+  .add .p{color:var(--accent);font-size:18px;font-weight:800;line-height:1;}
+
+  /* Liste */
+  .listhead{display:flex;align-items:baseline;margin:22px 4px 8px;}
+  .listhead .label{margin:0;}
+  .listhead .tot{margin-left:auto;font-size:12px;color:var(--muted);font-weight:600;}
+  .list{display:flex;flex-direction:column;gap:8px;}
+  .empty{
+    text-align:center;color:var(--muted);padding:30px 20px;font-size:14px;
+    border:1px dashed var(--line-2);border-radius:var(--radius);background:var(--card);
+  }
+  .empty b{color:var(--ink);display:block;margin-bottom:3px;}
+  .row{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:11px 12px;display:flex;align-items:center;gap:10px;
+  }
+  .row .info{flex:1;min-width:0;}
+  .row .cat{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);}
+  .row .nm{font-weight:600;font-size:15px;line-height:1.25;word-break:break-word;margin-top:1px;}
+  .stepper{display:flex;align-items:center;border:1px solid var(--line-2);border-radius:9px;overflow:hidden;background:#fff;}
+  .stepper button{width:34px;height:36px;border:none;background:#fff;font-size:19px;color:var(--ink);cursor:pointer;line-height:1;}
+  .stepper button:active{background:#F0F0EC;}
+  .stepper .q{min-width:52px;text-align:center;font-weight:700;font-size:15px;border-left:1px solid var(--line);border-right:1px solid var(--line);padding:0 4px;}
+  .stepper .q small{display:block;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:-1px;}
+  .del{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:2px 4px;line-height:1;}
+  .del:active{color:var(--accent);}
+
+  /* Aktionsleiste */
+  .actions{
+    position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(247,247,245,.94);
+    backdrop-filter:blur(8px);border-top:1px solid var(--line);
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  }
+  .actions .send{display:flex;gap:8px;max-width:620px;margin:0 auto;}
+  .act{
+    flex:1;background:var(--card);border:1px solid var(--line-2);border-radius:10px;
+    padding:11px 4px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+  }
+  .act .ic{font-size:17px;line-height:1;}
+  .act:active{background:#F0F0EC;}
+  .act:disabled{opacity:.4;}
+  .act .ic.g{color:#25A85B;}
+  .foot{display:flex;max-width:620px;margin:8px auto 0;gap:8px;}
+  .link-btn{flex:1;background:none;border:none;font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer;padding:2px;font-weight:600;}
+  .link-btn.reset{color:var(--accent);}
+
+  /* Sheet */
+  .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40;display:none;}
+  .sheet-bg.open{display:block;}
+  .sheet{
+    position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--bg);
+    border-radius:16px 16px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom));
+    transform:translateY(100%);transition:transform .22s ease;max-width:620px;margin:0 auto;
+  }
+  .sheet.open{transform:translateY(0);}
+  .sheet h3{margin:0 0 3px;font-size:17px;}
+  .sheet p{margin:0 0 16px;font-size:13px;color:var(--muted);}
+  .fld{margin-bottom:12px;}
+  .fld label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;}
+  .fld .hint{font-size:11px;color:var(--muted);margin-top:5px;}
+  .sheet .save{width:100%;background:var(--ink);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:700;font-size:15px;margin-top:4px;cursor:pointer;}
+
+  .toast{
+    position:fixed;bottom:180px;left:50%;transform:translateX(-50%) translateY(14px);
+    background:var(--ink);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;
+    opacity:0;transition:.22s;z-index:60;pointer-events:none;white-space:nowrap;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="toprow">
+    <span class="kw" id="kwLabel">KW</span>
+    <button class="gear" id="gearBtn" title="Empfänger">⚙︎</button>
+  </div>
+  <div class="logo">
+    <svg viewBox="0 0 262 60" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A. Simeth">
+      <path d="M6 52 C6 43 11 39 25 38 L96 36 C110 35 114 32 122 24 L150 7 C156 3 162 2 172 2 L209 2 C230 2 242 11 252 30 L258 41"
+        stroke="#18181B" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="wm">a. Simeth</div>
+    <div class="st">Smart Repair &amp; Fahrzeugpflege</div>
+    <div class="addr">Rottenried 1 · 82205 Gilching</div>
+  </div>
+</header>
+
+<main>
+  <div class="label">Material hinzufügen</div>
+  <div class="card">
+    <div class="fieldset">
+      <select id="mCat"></select>
+      <input type="text" id="mName" placeholder="Bezeichnung – z. B. Kreppband 30 mm gelb" autocomplete="off">
+      <div class="qtyrow">
+        <input type="text" class="qty mono" id="mQty" value="1" inputmode="numeric">
+        <select class="unit" id="mUnit"></select>
+      </div>
+      <button class="add" id="mAdd"><span class="p">+</span> Hinzufügen</button>
+    </div>
+  </div>
+
+  <div class="listhead">
+    <div class="label">Diese Woche</div>
+    <div class="tot" id="tot">0 Positionen</div>
+  </div>
+  <div class="list" id="list"></div>
+</main>
+
+<div class="actions">
+  <div class="send">
+    <button class="act" id="waBtn"><span class="ic g">✆</span>WhatsApp</button>
+    <button class="act" id="mailBtn"><span class="ic">✉︎</span>E-Mail</button>
+    <button class="act" id="pdfBtn"><span class="ic">⤓</span>PDF</button>
+  </div>
+  <div class="foot">
+    <button class="link-btn" id="cfgBtn">Empfänger einstellen</button>
+    <button class="link-btn reset" id="resetBtn">Woche leeren</button>
+  </div>
+</div>
+
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet">
+  <h3>Empfänger Außendienst</h3>
+  <p>Einmal hinterlegen – bleibt am Gerät. Danach gehen WhatsApp &amp; E-Mail direkt an ihn.</p>
+  <div class="fld"><label>Name</label><input type="text" id="sName" placeholder="Name"></div>
+  <div class="fld"><label>WhatsApp-Nummer</label><input type="text" id="sPhone" placeholder="+49 176 1234567" inputmode="tel"><div class="hint">Mit Ländervorwahl, z. B. +49 …</div></div>
+  <div class="fld"><label>E-Mail</label><input type="text" id="sMail" placeholder="name@lieferant.de" inputmode="email"></div>
+  <button class="save" id="saveCfg">Speichern</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY_ITEMS="simeth_material_items", KEY_CFG="simeth_material_cfg";
+const SHOP={name:"A. Simeth – Smart Repair & Fahrzeugpflege",addr:"Rottenried 1, 82205 Gilching",tel:"0176 / 21746627",mail:"a.simeth-fahrzeugpflege@gmx.de"};
+
+// Grobe Kategorien + jeweilige Standard-Einheit
+const CATS=[
+  {name:"Lacke & Farben", unit:"Dose"},
+  {name:"Kleben & Abdecken", unit:"Rolle"},
+  {name:"Schleifmittel", unit:"Blatt"},
+  {name:"Politur & Pflege", unit:"Stück"},
+  {name:"Reiniger & Chemie", unit:"Liter"},
+  {name:"Sonstiges", unit:"Stück"}
+];
+const UNITS=["Stück","Rolle","Blatt","Dose","Liter","Kanister","Paket","Set","Beutel","Meter"];
+
+let items=[], cfg={name:"",phone:"",mail:""};
+
+/* Persistenz */
+async function load(){
+  try{const r=await window.storage.get(KEY_ITEMS); if(r&&r.value) items=JSON.parse(r.value);}catch(e){items=[];}
+  try{const c=await window.storage.get(KEY_CFG); if(c&&c.value) cfg=JSON.parse(c.value);}catch(e){}
+}
+async function saveItems(){try{await window.storage.set(KEY_ITEMS,JSON.stringify(items));}catch(e){toast("Speichern fehlgeschlagen");}}
+async function saveCfg(){try{await window.storage.set(KEY_CFG,JSON.stringify(cfg));}catch(e){}}
+
+/* Woche */
+function weekInfo(){
+  const d=new Date(), day=(d.getDay()+6)%7;
+  const mon=new Date(d); mon.setDate(d.getDate()-day); mon.setHours(0,0,0,0);
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  const t=new Date(mon); t.setDate(mon.getDate()+3);
+  const jan1=new Date(t.getFullYear(),0,1);
+  const kw=Math.ceil((((t-jan1)/86400000)+1)/7);
+  const f=x=>String(x.getDate()).padStart(2,"0")+"."+String(x.getMonth()+1).padStart(2,"0")+".";
+  return{kw,range:f(mon)+"–"+f(sun)+mon.getFullYear()};
+}
+
+/* Add / Update */
+function addItem(name,unit,cat,qty){
+  name=(name||"").trim(); if(!name) return;
+  const ex=items.find(i=>i.name.toLowerCase()===name.toLowerCase()&&i.unit===unit&&i.cat===cat);
+  if(ex){ex.qty+=(qty||1);}
+  else{items.unshift({id:Date.now()+Math.random(),name,unit,cat:cat||"Sonstiges",qty:qty||1});}
+  saveItems(); render();
+}
+function changeQty(id,d){const it=items.find(i=>i.id===id); if(!it)return; it.qty+=d; if(it.qty<=0) items=items.filter(i=>i.id!==id); saveItems(); render();}
+function removeItem(id){items=items.filter(i=>i.id!==id); saveItems(); render();}
+
+/* Render */
+function fillSelects(){
+  const c=document.getElementById("mCat");
+  c.innerHTML=CATS.map(x=>'<option value="'+x.name+'">'+x.name+'</option>').join("");
+  const u=document.getElementById("mUnit");
+  u.innerHTML=UNITS.map(x=>'<option>'+x+'</option>').join("");
+  c.value="Kleben & Abdecken"; setDefaultUnit();
+  c.onchange=setDefaultUnit;
+}
+function setDefaultUnit(){
+  const cat=document.getElementById("mCat").value;
+  const found=CATS.find(x=>x.name===cat);
+  if(found) document.getElementById("mUnit").value=found.unit;
+}
+function render(){
+  const w=weekInfo();
+  document.getElementById("kwLabel").textContent="KW "+w.kw;
+  document.getElementById("tot").textContent=items.length+" Position"+(items.length===1?"":"en");
+  const list=document.getElementById("list");
+  if(items.length===0){
+    list.innerHTML='<div class="empty"><b>Noch nichts erfasst.</b>Kategorie wählen, Bezeichnung eintippen, Menge – fertig. Bleibt gespeichert.</div>';
+  }else{
+    list.innerHTML="";
+    items.forEach(it=>{
+      const el=document.createElement("div"); el.className="row";
+      el.innerHTML='<div class="info"><div class="cat"></div><div class="nm"></div></div>'+
+        '<div class="stepper"><button data-m="-1">–</button><span class="q mono">'+it.qty+'<small>'+it.unit+'</small></span><button data-m="1">+</button></div>'+
+        '<button class="del">×</button>';
+      el.querySelector(".cat").textContent=it.cat;
+      el.querySelector(".nm").textContent=it.name;
+      el.querySelector('[data-m="-1"]').onclick=()=>changeQty(it.id,-1);
+      el.querySelector('[data-m="1"]').onclick=()=>changeQty(it.id,1);
+      el.querySelector(".del").onclick=()=>removeItem(it.id);
+      list.appendChild(el);
+    });
+  }
+  const dis=items.length===0;
+  ["waBtn","mailBtn","pdfBtn"].forEach(id=>document.getElementById(id).disabled=dis);
+}
+
+/* Textliste */
+function buildText(md){
+  const w=weekInfo(), b=md?"*":"";
+  let out=b+"A. Simeth – Materialliste"+b+"\nKW "+w.kw+" ("+w.range+")\n";
+  const byCat={}; items.forEach(i=>{(byCat[i.cat]=byCat[i.cat]||[]).push(i);});
+  Object.keys(byCat).forEach(cat=>{out+="\n"+b+cat+b+"\n"; byCat[cat].forEach(i=>out+="• "+i.name+" – "+i.qty+" "+i.unit+"\n");});
+  out+="\nGesamt: "+items.length+" Positionen"; return out;
+}
+
+/* PDF */
+function makePDF(){
+  const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:"mm",format:"a4"}); const w=weekInfo();
+  doc.setFont("helvetica","bold"); doc.setFontSize(17);
+  doc.setTextColor(226,75,67); doc.text("A.",14,17); doc.setTextColor(24,24,27); doc.text("Simeth",21,17);
+  doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(110,110,115);
+  doc.text("Smart Repair & Fahrzeugpflege",14,22);
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(24,24,27);
+  doc.text("Materialliste",196,13,{align:"right"});
+  doc.setTextColor(226,75,67); doc.text("KW "+w.kw,196,19,{align:"right"});
+  doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(110,110,115);
+  doc.text(w.range,196,23.5,{align:"right"});
+  doc.setDrawColor(228,228,224); doc.setLineWidth(.3); doc.line(14,27,196,27);
+  doc.setFontSize(8); doc.setTextColor(110,110,115);
+  doc.text(SHOP.addr+"  ·  "+SHOP.tel+"  ·  "+SHOP.mail,14,33);
+  if(cfg.name){doc.setFont("helvetica","bold"); doc.setTextColor(24,24,27); doc.text("An: "+cfg.name,14,38);}
+  const rows=items.map(i=>[i.cat,i.name,String(i.qty),i.unit]);
+  doc.autoTable({
+    startY:cfg.name?43:40,
+    head:[["Kategorie","Bezeichnung","Menge","Einheit"]],
+    body:rows,
+    styles:{font:"helvetica",fontSize:10,cellPadding:2.8,lineColor:[231,231,227],lineWidth:.2,textColor:[24,24,27]},
+    headStyles:{fillColor:[24,24,27],textColor:[255,255,255],fontStyle:"bold"},
+    alternateRowStyles:{fillColor:[249,249,247]},
+    columnStyles:{0:{cellWidth:40,textColor:[110,110,115]},2:{halign:"center",cellWidth:20},3:{cellWidth:24}},
+    margin:{left:14,right:14}
+  });
+  let y=doc.lastAutoTable.finalY+8;
+  doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(24,24,27);
+  doc.text("Gesamt: "+items.length+" Positionen",14,y);
+  doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(150,150,150);
+  doc.text("Erstellt am "+new Date().toLocaleDateString("de-DE"),196,y,{align:"right"});
+  doc.save("Materialliste_KW"+w.kw+"_Simeth.pdf");
+}
+
+/* Toast */
+let tt; function toast(m){const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("show"),1300);}
+
+/* Events */
+document.getElementById("mAdd").onclick=()=>{
+  const n=document.getElementById("mName"),q=document.getElementById("mQty"),u=document.getElementById("mUnit"),c=document.getElementById("mCat");
+  if(!n.value.trim()){n.focus(); return;}
+  const qty=Math.max(1,parseInt(q.value)||1);
+  addItem(n.value,u.value,c.value,qty);
+  toast("Hinzugefügt"); n.value=""; q.value="1"; n.focus();
+};
+document.getElementById("mName").addEventListener("keydown",e=>{if(e.key==="Enter") document.getElementById("mAdd").click();});
+
+document.getElementById("waBtn").onclick=()=>{const num=(cfg.phone||"").replace(/[^0-9]/g,""); window.open("https://wa.me/"+num+"?text="+encodeURIComponent(buildText(true)),"_blank");};
+document.getElementById("mailBtn").onclick=()=>{const w=weekInfo(); const sub=encodeURIComponent("Materialliste KW "+w.kw+" – A. Simeth"); const body=encodeURIComponent(buildText(false)+"\n\n– "+SHOP.name+"\n"+SHOP.tel); window.location.href="mailto:"+(cfg.mail||"")+"?subject="+sub+"&body="+body;};
+document.getElementById("pdfBtn").onclick=()=>{try{makePDF();}catch(e){toast("PDF-Fehler"); console.error(e);}};
+document.getElementById("resetBtn").onclick=()=>{if(items.length===0)return; if(confirm("Woche leeren? Am besten vorher verschicken.")){items=[]; saveItems(); render(); toast("Neue Woche gestartet");}};
+
+/* Sheet */
+function openSheet(){document.getElementById("sName").value=cfg.name||""; document.getElementById("sPhone").value=cfg.phone||""; document.getElementById("sMail").value=cfg.mail||""; document.getElementById("sheetBg").classList.add("open"); document.getElementById("sheet").classList.add("open");}
+function closeSheet(){document.getElementById("sheetBg").classList.remove("open"); document.getElementById("sheet").classList.remove("open");}
+document.getElementById("cfgBtn").onclick=openSheet;
+document.getElementById("gearBtn").onclick=openSheet;
+document.getElementById("sheetBg").onclick=closeSheet;
+document.getElementById("saveCfg").onclick=()=>{cfg.name=document.getElementById("sName").value.trim(); cfg.phone=document.getElementById("sPhone").value.trim(); cfg.mail=document.getElementById("sMail").value.trim(); saveCfg(); closeSheet(); toast("Empfänger gespeichert");};
+
+/* Init */
+(async()=>{await load(); fillSelects(); render();})();
+</script>
+</body>
+</html>
