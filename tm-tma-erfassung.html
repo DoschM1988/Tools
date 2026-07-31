@@ -371,13 +371,23 @@
         <span class="probe-badge"><span class="dot"></span>TMA je Tier &amp; Tag</span>
       </div>
 
-      <div id="tmaMissing" class="tma-missing" style="display:none;">
-        Bitte zuerst oben eine Probe messen &ndash; daraus wird der TM-Gehalt übernommen.
-      </div>
-
       <div id="tmaBody">
         <div class="tma-basis" id="tmaBasis"></div>
         <div class="fields">
+          <div class="row2">
+            <div class="field">
+              <label>Futtersorte</label>
+              <select id="tmaSorte" onchange="updateTMA()">
+                <option value="">Bitte wählen ...</option>
+                <option value="TMR Milchvieh">TMR Milchvieh</option>
+                <option value="TMR Trockensteher">TMR Trockensteher</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>TM-Gehalt (%)</label>
+              <input type="number" inputmode="decimal" step="0.1" min="0" id="tmaTm" class="num" oninput="updateTMA()" placeholder="z. B. 40,0">
+            </div>
+          </div>
           <div class="row2">
             <div class="field">
               <label>Futtervorlage (kg)</label>
@@ -563,23 +573,12 @@ function tmaMoeglich() {
   return false;
 }
 
-/* Haken freigeben/sperren je nach Eignung */
+/* Haken ist immer aktiv – TMA kann auch ohne Messung ausgefüllt werden */
 function updateTmaAvailability() {
-  const moeglich = tmaMoeglich();
-  const toggle = document.getElementById('tmaToggle');
-  const wrap = document.getElementById('tmaToggleWrap');
   const sub = document.getElementById('tmaToggleSub');
-
-  toggle.disabled = !moeglich;
-  wrap.classList.toggle('disabled', !moeglich);
-  sub.textContent = moeglich
-    ? 'je Tier und Tag – auf Basis der Messung oben'
-    : 'Nur für TMR (Milchvieh/Milchvieh oder Trockensteher/Trockensteher)';
-
-  if (!moeglich && toggle.checked) {
-    toggle.checked = false;
-    document.getElementById('tmaArea').style.display = 'none';
-  }
+  if (sub) sub.textContent = 'je Tier und Tag – Werte aus Messung oder manuell';
+  // ggf. Grundlage aus Messung übernehmen
+  syncTmaGrundlage();
 }
 
 function fmtKg(v) {
@@ -599,47 +598,51 @@ function referenzMessung() {
   return null;
 }
 
+/* Grundlage (Sorte + TM%) aus der Messung übernehmen, falls vorhanden und TMR */
+function syncTmaGrundlage() {
+  const ref = referenzMessung();
+  if (ref && istTMR(ref.sorte)) {
+    document.getElementById('tmaSorte').value = ref.sorte;
+    document.getElementById('tmaTm').value = ref.tm.toFixed(1).replace('.', ',');
+    document.getElementById('tmaBasis').innerHTML =
+      `TM-Grundlage automatisch aus Messung übernommen (${ref.quelle}). Änderbar.`;
+  } else {
+    document.getElementById('tmaBasis').innerHTML =
+      `Keine passende Messung oben – Futtersorte und TM-Gehalt bitte hier eintragen.`;
+  }
+}
+
 function toggleTMA() {
   const toggle = document.getElementById('tmaToggle');
-  if (toggle.checked && !tmaMoeglich()) { toggle.checked = false; return; }
   document.getElementById('tmaArea').style.display = toggle.checked ? 'block' : 'none';
-  if (toggle.checked) updateTMA();
+  if (toggle.checked) { syncTmaGrundlage(); updateTMA(); }
 }
 
 function tmaWerte() {
-  const ref = referenzMessung();
+  const sorte   = document.getElementById('tmaSorte').value;
+  const tm      = parseFloat((document.getElementById('tmaTm').value || '').replace(',', '.')) || 0;
   const vorlage = parseFloat(document.getElementById('vorlage').value) || 0;
   const rest    = parseFloat(document.getElementById('rest').value) || 0;
   const tiere   = parseFloat(document.getElementById('tiere').value) || 0;
-  const istMV   = !!ref && ref.sorte === 'TMR Milchvieh';
+  const istMV   = sorte === 'TMR Milchvieh';
   const kf      = istMV ? (parseFloat(document.getElementById('kraftfutter').value) || 0) : 0;
   const frisch  = vorlage - rest;
-  const rechenbar = ref && tiere > 0 && frisch > 0;
+  const rechenbar = !!sorte && tm > 0 && tiere > 0 && frisch > 0;
   let tmaRation = 0, kfProTier = 0, gesamt = 0;
   if (rechenbar) {
-    tmaRation = frisch * (ref.tm / 100) / tiere;
+    tmaRation = frisch * (tm / 100) / tiere;
     kfProTier = istMV ? (kf * KRAFTFUTTER_TM) / tiere : 0;
     gesamt    = tmaRation + kfProTier;
   }
-  return { ref, vorlage, rest, tiere, istMV, kf, frisch, tmaRation, kfProTier, gesamt, rechenbar };
+  return { sorte, tm, vorlage, rest, tiere, istMV, kf, frisch, tmaRation, kfProTier, gesamt, rechenbar };
 }
 
 function updateTMA() {
   if (!document.getElementById('tmaToggle').checked) return;
-  const ref = referenzMessung();
 
-  if (!ref) {
-    document.getElementById('tmaMissing').style.display = 'block';
-    document.getElementById('tmaBody').style.display = 'none';
-    return;
-  }
-  document.getElementById('tmaMissing').style.display = 'none';
-  document.getElementById('tmaBody').style.display = 'block';
-
-  const istMV = ref.sorte === 'TMR Milchvieh';
+  const sorte = document.getElementById('tmaSorte').value;
+  const istMV = sorte === 'TMR Milchvieh';
   document.getElementById('kraftfutterField').style.display = istMV ? 'flex' : 'none';
-  document.getElementById('tmaBasis').innerHTML =
-    `TM-Grundlage: <b>${fmtPct(ref.tm)}</b> &middot; ${ref.sorte} (${ref.quelle})`;
 
   const w = tmaWerte();
   const box = document.getElementById('tmaResult');
@@ -657,11 +660,11 @@ function updateTMA() {
   document.getElementById('tmaBreakdown').innerHTML = items;
   document.getElementById('tmaTotal').textContent = fmtKg(w.gesamt) + ' /Tier';
 
-  const opt = TMA_OPTIMAL[ref.sorte];
+  const opt = TMA_OPTIMAL[w.sorte];
   const verdictEl = document.getElementById('tmaVerdict');
   const rangeEl = document.getElementById('tmaRange');
   if (opt) {
-    rangeEl.textContent = `Zielbereich ${ref.sorte}: ${opt.min}–${opt.max} kg TM/Tier`;
+    rangeEl.textContent = `Zielbereich ${w.sorte}: ${opt.min}–${opt.max} kg TM/Tier`;
     if (w.gesamt < opt.min) {
       box.classList.remove('ok'); box.classList.add('off');
       verdictEl.textContent = 'Unter dem Zielbereich – Aufnahme zu niedrig.';
@@ -678,7 +681,7 @@ function updateTMA() {
       verdictEl.textContent = 'Im Zielbereich.';
     }
   } else {
-    rangeEl.textContent = 'Kein TMA-Zielbereich für diese Sorte hinterlegt.';
+    rangeEl.textContent = '';
     verdictEl.textContent = '';
     box.classList.remove('off'); box.classList.add('ok');
   }
@@ -736,14 +739,14 @@ function sendMail() {
     const w = tmaWerte();
     if (w.rechenbar) {
       body += `--- TMA je Tier & Tag ---\n`
-            + `TM-Grundlage:   ${fmtPct(w.ref.tm)} (${w.ref.sorte}, ${w.ref.quelle})\n`
+            + `TM-Grundlage:   ${fmtPct(w.tm)} (${w.sorte})\n`
             + `Futtervorlage:  ${w.vorlage} kg\n`
             + `Restfutter:     ${w.rest} kg\n`
             + `Anzahl Tiere:   ${w.tiere}\n`;
       if (w.istMV) body += `Kraftfutter:    ${w.kf} kg/Tag gesamt, 88 % TM (${fmtKg(w.kfProTier)}/Tier)\n`;
       body += `TMA aus Ration: ${fmtKg(w.tmaRation)}/Tier\n`
             + `Gesamt-TMA:     ${fmtKg(w.gesamt)}/Tier\n`;
-      const opt = TMA_OPTIMAL[w.ref.sorte];
+      const opt = TMA_OPTIMAL[w.sorte];
       if (opt) {
         let st;
         if (w.gesamt < opt.min) st = 'unter Zielbereich';
@@ -755,10 +758,29 @@ function sendMail() {
     }
   }
   body += `------------------------\n`;
-  body += `Für Excel (beide Zeilen markieren, kopieren, in Excel einfügen –\n`;
-  body += `oder ab dem 2. Mal nur die untere Datenzeile):\n\n`;
+  body += `Für Excel: die zwei Zeilen unten markieren und kopieren,\n`;
+  body += `in Excel in eine Zelle einfügen, dann:\n`;
+  body += `Daten → Text in Spalten → Getrennt → nur „Semikolon" anhaken.\n`;
+  body += `(Ab dem 2. Mal reicht die untere Datenzeile.)\n\n`;
 
-  /* Zahl deutsch (Komma) oder leer */
+  const ex = excelData();
+  body += ex.spalten.join(';') + `\n`;
+  body += ex.daten.join(';') + `\n`;
+
+  const subject = encodeURIComponent(`TM-Messung Doschhof ${heute}`);
+  window.location.href = `mailto:${MAIL_TO}?subject=${subject}&body=${encodeURIComponent(body)}`;
+
+  // Nach dem Versand Maske automatisch leeren
+  resetForm();
+}
+
+/* ============ Excel-Zeilen (Kopf + Daten) ============ */
+function excelData() {
+  const p1 = readProbe(1);
+  const p2 = readProbe(2);
+  const heute = new Date().toLocaleDateString('de-DE');
+  const uhrzeit = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
   const z = (v, dez) => (v === null || v === undefined || v === '' || isNaN(v))
     ? '' : Number(v).toFixed(dez).replace('.', ',');
 
@@ -770,8 +792,8 @@ function sendMail() {
     const tw = tmaWerte();
     if (tw.rechenbar) w = tw;
   }
-  const zielbereich = (w.rechenbar && TMA_OPTIMAL[w.ref.sorte])
-    ? `${TMA_OPTIMAL[w.ref.sorte].min}-${TMA_OPTIMAL[w.ref.sorte].max} kg` : '';
+  const zielbereich = (w.rechenbar && TMA_OPTIMAL[w.sorte])
+    ? `${TMA_OPTIMAL[w.sorte].min}-${TMA_OPTIMAL[w.sorte].max} kg` : '';
 
   const spalten = [
     'Datum','Uhrzeit',
@@ -788,7 +810,7 @@ function sendMail() {
     p1.tm !== null ? (p1.sorte || '') : '', p1.tm !== null ? p1.ein : '', p1.tm !== null ? p1.aus : '', z(p1.tm, 1),
     p2.tm !== null ? (p2.sorte || '') : '', p2.tm !== null ? p2.ein : '', p2.tm !== null ? p2.aus : '', z(p2.tm, 1),
     z(avgVal, 1),
-    w.rechenbar ? z(w.ref.tm, 1) : '',
+    w.rechenbar ? z(w.tm, 1) : '',
     w.rechenbar ? w.vorlage : '',
     w.rechenbar ? w.rest : '',
     w.rechenbar ? w.tiere : '',
@@ -799,14 +821,8 @@ function sendMail() {
     zielbereich
   ];
 
-  body += spalten.join('\t') + `\n`;
-  body += daten.join('\t') + `\n`;
-
-  const subject = encodeURIComponent(`TM-Messung Doschhof ${heute}`);
-  window.location.href = `mailto:${MAIL_TO}?subject=${subject}&body=${encodeURIComponent(body)}`;
-
-  // Nach dem Versand Maske automatisch leeren
-  resetForm();
+  const hatDaten = p1.tm !== null || p2.tm !== null;
+  return { spalten, daten, hatDaten };
 }
 
 /* ============ Speichern / Wiederherstellen (localStorage) ============ */
@@ -822,6 +838,8 @@ function saveState() {
       p2e: document.querySelector('#probe2 .einwaage').value,
       p2a: document.querySelector('#probe2 .auswaage').value,
       tma: document.getElementById('tmaToggle').checked,
+      tmaSorte: document.getElementById('tmaSorte').value,
+      tmaTm: document.getElementById('tmaTm').value,
       vorlage: document.getElementById('vorlage').value,
       rest: document.getElementById('rest').value,
       tiere: document.getElementById('tiere').value,
@@ -842,13 +860,14 @@ function restoreState() {
     document.querySelector('#probe2 .sorte').value = s.p2s || '';
     document.querySelector('#probe2 .einwaage').value = s.p2e || '';
     document.querySelector('#probe2 .auswaage').value = s.p2a || '';
+    document.getElementById('tmaSorte').value = s.tmaSorte || '';
+    document.getElementById('tmaTm').value = s.tmaTm || '';
     document.getElementById('vorlage').value = s.vorlage || '';
     document.getElementById('rest').value = s.rest || '';
     document.getElementById('tiere').value = s.tiere || '';
     document.getElementById('kraftfutter').value = s.kf || '';
     calc(1); calc(2);
-    updateTmaAvailability();
-    if (s.tma && tmaMoeglich()) {
+    if (s.tma) {
       document.getElementById('tmaToggle').checked = true;
       document.getElementById('tmaArea').style.display = 'block';
       updateTMA();
@@ -860,7 +879,8 @@ function resetForm() {
   ['#probe1 .sorte','#probe1 .einwaage','#probe1 .auswaage',
    '#probe2 .sorte','#probe2 .einwaage','#probe2 .auswaage']
     .forEach(sel => { const el = document.querySelector(sel); if (el) el.value = ''; });
-  ['vorlage','rest','tiere','kraftfutter'].forEach(id => document.getElementById(id).value = '');
+  ['vorlage','rest','tiere','kraftfutter','tmaTm'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('tmaSorte').value = '';
   document.getElementById('tmaToggle').checked = false;
   document.getElementById('tmaArea').style.display = 'none';
   calc(1); calc(2);
@@ -882,4 +902,5 @@ document.addEventListener('change', saveState);
 </script>
 </body>
 </html>
+
 
