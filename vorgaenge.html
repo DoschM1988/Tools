@@ -93,6 +93,67 @@
   .success p{color:#64748b;font-size:14px;margin:8px 0 0}
   .hidden{display:none!important}
   .print-head{display:none}
+
+
+  /* ---------- Spracherfassung ---------- */
+  .voice-card{border:1px solid rgba(0,96,160,.24);background:linear-gradient(145deg,#fff 0%,rgba(0,96,160,.055) 100%);border-radius:18px;padding:17px;margin-bottom:26px;box-shadow:0 10px 28px rgba(15,23,42,.055)}
+  .voice-head{display:flex;gap:12px;align-items:flex-start}
+  .voice-icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:var(--blue);color:#fff;flex:0 0 auto;box-shadow:0 7px 18px rgba(0,96,160,.22)}
+  .voice-icon svg{width:23px;height:23px;stroke:currentColor}
+  .voice-copy h2{font-size:17px;margin:1px 0 4px;color:var(--ink)}
+  .voice-copy p{font-size:13px;line-height:1.45;color:#64748b;margin:0}
+  .voice-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px}
+  .voice-action{min-height:50px;border:1px solid rgba(0,96,160,.28);border-radius:12px;background:#fff;color:var(--blue-dk);font:inherit;font-size:13px;font-weight:800;cursor:pointer;padding:9px 11px;display:flex;align-items:center;justify-content:center;gap:7px;text-align:center}
+  .voice-action svg{width:18px;height:18px;stroke:currentColor;flex:0 0 auto}
+  .voice-action:hover{background:var(--blue-tint);border-color:var(--blue)}
+  .voice-action:disabled{opacity:.5;cursor:not-allowed}
+  .voice-privacy{display:flex;align-items:flex-start;gap:7px;margin-top:12px;padding-top:11px;border-top:1px solid rgba(0,96,160,.12);font-size:11px;line-height:1.45;color:#64748b}
+  .voice-privacy svg{width:15px;height:15px;stroke:var(--blue);flex:0 0 auto;margin-top:1px}
+  .voice-support{margin-top:9px;font-size:12px;font-weight:700}
+  .voice-support.ok{color:#15803d}.voice-support.bad{color:var(--red)}
+  .section-headline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .section-headline .lbl-sec{margin:0}
+  .section-mic{border:1px solid var(--line);background:#fff;color:var(--blue);border-radius:999px;min-height:34px;padding:0 11px;display:inline-flex;align-items:center;gap:5px;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+  .section-mic svg{width:15px;height:15px;stroke:currentColor}
+  .section-mic:hover{border-color:var(--blue);background:var(--blue-tint)}
+  .field.voice-field{position:relative}
+  .field.voice-field input,.field.voice-field textarea,.field.voice-field select{padding-right:50px}
+  .field-mic{position:absolute;right:7px;top:31px;width:36px;height:36px;border:0;border-radius:10px;background:var(--blue-tint);color:var(--blue);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2}
+  .field-mic.compact{top:6px}
+  .field-mic svg{width:18px;height:18px;stroke:currentColor}
+  .field-mic:hover{background:#dbeafe}
+  .field-mic.listening{background:var(--red);color:#fff;animation:voicePulse 1.15s infinite}
+  @keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(224,0,16,.32)}50%{box-shadow:0 0 0 8px rgba(224,0,16,0)}}
+  .voice-layer{position:fixed;inset:0;background:rgba(15,23,42,.54);z-index:100;display:flex;align-items:flex-end;justify-content:center;padding:18px 12px max(18px,env(safe-area-inset-bottom));backdrop-filter:blur(3px)}
+  .voice-sheet{width:min(640px,100%);max-height:min(84vh,760px);overflow:auto;background:#fff;border-radius:22px;padding:20px;box-shadow:0 24px 70px rgba(15,23,42,.28)}
+  .voice-sheet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .voice-sheet-head h2{margin:0;font-size:19px}
+  .voice-sheet-head p{margin:4px 0 0;color:#64748b;font-size:13px;line-height:1.4}
+  .voice-close{width:38px;height:38px;border:0;border-radius:10px;background:#f1f5f9;color:#475569;font-size:24px;line-height:1;cursor:pointer}
+  .voice-status{display:flex;align-items:center;gap:10px;margin:18px 0 12px;padding:12px 14px;border-radius:13px;background:#f8fafc;border:1px solid var(--line-soft);font-size:13px;font-weight:800;color:#475569}
+  .voice-dot{width:11px;height:11px;border-radius:999px;background:var(--muted);flex:0 0 auto}
+  .voice-status.listening{background:var(--red-tint);border-color:rgba(224,0,16,.16);color:var(--red)}
+  .voice-status.listening .voice-dot{background:var(--red);animation:voicePulse 1.15s infinite}
+  .voice-transcript{min-height:96px;border:1px solid var(--line);border-radius:14px;padding:13px 14px;font-size:15px;line-height:1.5;color:#1e293b;background:#fff;white-space:pre-wrap}
+  .voice-transcript .interim{color:var(--muted)}
+  .voice-prompt{border-radius:14px;background:var(--blue-tint);padding:14px;margin:14px 0;color:var(--blue-dk);font-size:15px;font-weight:800;line-height:1.4}
+  .voice-changes{margin-top:14px}
+  .voice-changes h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 8px}
+  .voice-change{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--line-soft);cursor:pointer}
+  .voice-change:last-child{border-bottom:0}
+  .voice-change input{width:18px;height:18px;margin-top:2px;accent-color:var(--blue);flex:0 0 auto}
+  .voice-change strong{display:block;font-size:13px;color:#334155;margin-bottom:2px}
+  .voice-change span{font-size:14px;color:#0f172a;overflow-wrap:anywhere}
+  .voice-empty{padding:13px;border-radius:12px;background:#fff7ed;color:#9a3412;font-size:13px;line-height:1.45}
+  .voice-sheet-actions{display:flex;gap:9px;margin-top:18px;position:sticky;bottom:-20px;background:#fff;padding:12px 0 0}
+  .voice-sheet-actions .btn{min-height:52px;font-size:14px}
+  .voice-sheet-actions .btn-voice-stop{background:var(--red);color:#fff;flex:1}
+  .voice-sheet-actions .btn-voice-next{background:var(--blue);color:#fff;flex:1}
+  .voice-sheet-actions .btn-voice-apply{background:var(--blue);color:#fff;flex:1}
+  .voice-sheet-actions .btn-voice-cancel{background:#fff;border:1px solid var(--line);color:var(--slate);padding:0 16px}
+  .voice-toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:120;background:#0f172a;color:#fff;border-radius:12px;padding:11px 15px;font-size:13px;font-weight:700;box-shadow:0 12px 28px rgba(15,23,42,.25);max-width:calc(100% - 32px);text-align:center}
+  @media(max-width:430px){.voice-actions{grid-template-columns:1fr}.voice-sheet{padding:17px}.voice-sheet-actions{flex-wrap:wrap}.voice-sheet-actions .btn-voice-cancel{width:100%}}
+
   @media print{
     header,.footer,.no-print{display:none!important}
     .print-head{display:block!important;margin-bottom:14px}
@@ -114,6 +175,22 @@
   </header>
   <main class="wrap">
     <div id="err-banner" class="banner error hidden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Bitte die markierten Felder prüfen.</div>
+
+    <section class="voice-card no-print" id="voice-card">
+      <div class="voice-head">
+        <div class="voice-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg></div>
+        <div class="voice-copy">
+          <h2>Vorgang per Sprache erfassen</h2>
+          <p>Komplett frei sprechen, Schritt für Schritt ausfüllen oder die Mikrofone an einzelnen Bereichen und Feldern nutzen.</p>
+        </div>
+      </div>
+      <div class="voice-actions">
+        <button type="button" class="voice-action" id="voice-global"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg>Kompletten Vorgang sprechen</button>
+        <button type="button" class="voice-action" id="voice-guided"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m8 12 2 2 5-5"/></svg>Geführt ausfüllen</button>
+      </div>
+      <div class="voice-privacy"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg><span>Die Testseite erstellt und speichert keine Audiodatei. Nach der Erkennung bleibt nur der bestätigte Text im Formular. Die eigentliche Spracherkennung wird vom verwendeten Browser bereitgestellt.</span></div>
+      <div id="voice-support" class="voice-support"></div>
+    </section>
 
     <section>
       <p class="lbl-sec">Bearbeiter</p>
@@ -211,6 +288,28 @@
   </div>
 </div>
 
+
+<!-- SPRACHERFASSUNG -->
+<div id="voice-layer" class="voice-layer hidden no-print" role="dialog" aria-modal="true" aria-labelledby="voice-title">
+  <div class="voice-sheet">
+    <div class="voice-sheet-head">
+      <div><h2 id="voice-title">Spracherfassung</h2><p id="voice-subtitle">Sprechen Sie natürlich. Erkannte Angaben werden vor dem Übernehmen angezeigt.</p></div>
+      <button type="button" class="voice-close" id="voice-close" aria-label="Schließen">×</button>
+    </div>
+    <div id="voice-prompt" class="voice-prompt hidden"></div>
+    <div id="voice-status" class="voice-status"><span class="voice-dot"></span><span id="voice-status-text">Bereit</span></div>
+    <div id="voice-transcript" class="voice-transcript">Noch keine Sprache erkannt.</div>
+    <div id="voice-changes" class="voice-changes hidden"><h3>Erkannte Angaben</h3><div id="voice-change-list"></div></div>
+    <div class="voice-sheet-actions">
+      <button type="button" class="btn btn-voice-cancel" id="voice-cancel">Abbrechen</button>
+      <button type="button" class="btn btn-voice-stop hidden" id="voice-stop">Aufnahme beenden</button>
+      <button type="button" class="btn btn-voice-next hidden" id="voice-next">Antwort sprechen</button>
+      <button type="button" class="btn btn-voice-apply hidden" id="voice-apply">Auswahl übernehmen</button>
+    </div>
+  </div>
+</div>
+<div id="voice-toast" class="voice-toast hidden" aria-live="polite"></div>
+
 <script>
 /* ---------- Konfiguration (hier anpassen) ---------- */
 const EMPFAENGER = "max@deutscher-kaelteklima.de";
@@ -228,7 +327,7 @@ const LEIST_REP=["Störungsprüfung","Reparatur","Wartung","Filterwechsel","Dich
 const DRING=["Normal","Zeitnah","Dringend","Ausgefallen"];
 const ZEITFENSTER=["Vormittag","Nachmittag","Ganztägig"];
 const ART_LABEL=Object.fromEntries(ARTEN.map(a=>[a.id,a.label]));
-const LS_KEY="md_vorgang_draft_v2";
+const LS_KEY="md_vorgang_voice_test_v1";
 
 /* ---------- State ---------- */
 const state = {
@@ -242,7 +341,7 @@ let vorgang=null;
 
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const esc=s=>String(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;"}[c]));
 const deDate=iso=>iso?iso.split("-").reverse().join("."):"";
 const persist=()=>{try{localStorage.setItem(LS_KEY,JSON.stringify(state));}catch(e){}};
 
@@ -373,6 +472,352 @@ function mailText(){
   L.push("—",BETRIEB.name,BETRIEB.strasse+", "+BETRIEB.ort);
   return L.join("\n");
 }
+
+
+/* ---------- Spracherfassung: GitHub-Test ohne API-Schlüssel ---------- */
+const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+const VOICE_LANGUAGE = "de-DE";
+const VOICE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg>';
+const FIELD_LABELS = {
+  art:"Auftragsart", name:"Name / Kunde", firma:"Firma / Verwaltung", tel:"Telefon", email:"E-Mail",
+  strasse:"Straße & Nr.", plz:"PLZ", ort:"Ort", objekt:"Abweichender Einsatzort", gebaeude:"Gebäudeart",
+  flaeche:"Fläche / Räume", bestand:"Vorhandene Technik", leistung:"Gewünschte Leistung", zeitraum:"Ausführungszeitraum",
+  anlage:"Anlagenart", herstellerModell:"Hersteller / Modell", fehler:"Problem", betrieb:"Anlage in Betrieb",
+  dring:"Dringlichkeit", termin:"Wunschtermin", zeitfenster:"Zeitfenster", beschreibung:"Notiz / Beschreibung"
+};
+const SECTION_FIELDS = {
+  kontakt:["name","firma","tel","email","strasse","plz","ort","objekt"],
+  technik:["gebaeude","flaeche","bestand","leistung","zeitraum","anlage","herstellerModell","fehler","betrieb","dring"],
+  termin:["termin","zeitfenster","beschreibung"]
+};
+const ALL_FIELD_MARKERS = [
+  "auftragsart","art","name","kunde","firma","verwaltung","telefon","handynummer","e-mail","email","mail",
+  "straße","strasse","adresse","postleitzahl","plz","ort","einsatzort","objekt","gebäudeart","gebaeudeart",
+  "fläche","flaeche","räume","raeume","bestand","vorhandene technik","leistung","ausführungszeitraum","zeitraum",
+  "anlagenart","anlage","hersteller","modell","problem","fehler","störung","stoerung","in betrieb","dringlichkeit",
+  "termin","wunschtermin","zeitfenster","notiz","beschreibung"
+];
+const GUIDED_BASE = [
+  ["art","Welche Auftragsart ist es: Neubau, Umbau oder Reparatur?"],
+  ["name","Wie lautet der Name des Kunden oder Ansprechpartners?"],
+  ["firma","Gibt es eine Firma oder Verwaltung? Sagen Sie sonst: überspringen."],
+  ["tel","Wie lautet die Telefonnummer?"],
+  ["email","Wie lautet die E-Mail-Adresse? Sagen Sie sonst: überspringen."],
+  ["strasse","Wie lautet Straße und Hausnummer? Sagen Sie sonst: überspringen."],
+  ["plz","Wie lautet die Postleitzahl? Sagen Sie sonst: überspringen."],
+  ["ort","Wie lautet der Ort? Sagen Sie sonst: überspringen."]
+];
+
+const voiceState = {
+  recognition:null, mode:null, target:null, section:null, finalText:"", interimText:"", changes:{}, listening:false,
+  guidedSteps:[], guidedIndex:0, guidedCollected:{}, guidedAnswerMode:false
+};
+
+function voiceSupported(){ return !!SpeechRecognitionClass; }
+function showVoiceToast(msg){
+  const el=$('#voice-toast'); el.textContent=msg; el.classList.remove('hidden');
+  clearTimeout(showVoiceToast.timer); showVoiceToast.timer=setTimeout(()=>el.classList.add('hidden'),2600);
+}
+function setVoiceStatus(text,listening=false){
+  $('#voice-status-text').textContent=text;
+  $('#voice-status').classList.toggle('listening',listening);
+}
+function openVoiceLayer(title,subtitle){
+  $('#voice-title').textContent=title;
+  $('#voice-subtitle').textContent=subtitle || 'Sprechen Sie natürlich. Erkannte Angaben werden vor dem Übernehmen angezeigt.';
+  $('#voice-layer').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
+function closeVoiceLayer(){
+  stopRecognition(true);
+  $('#voice-layer').classList.add('hidden');
+  document.body.style.overflow='';
+  $$('.field-mic.listening').forEach(b=>b.classList.remove('listening'));
+  resetVoiceUi();
+}
+function resetVoiceUi(){
+  voiceState.mode=null; voiceState.target=null; voiceState.section=null; voiceState.finalText=''; voiceState.interimText=''; voiceState.changes={}; voiceState.listening=false; voiceState.guidedAnswerMode=false;
+  $('#voice-prompt').classList.add('hidden'); $('#voice-prompt').textContent='';
+  $('#voice-transcript').textContent='Noch keine Sprache erkannt.';
+  $('#voice-changes').classList.add('hidden'); $('#voice-change-list').innerHTML='';
+  $('#voice-stop').classList.add('hidden'); $('#voice-next').classList.add('hidden'); $('#voice-apply').classList.add('hidden');
+  setVoiceStatus('Bereit',false);
+}
+function startRecognition({mode,target=null,section=null,keepExisting=false}={}){
+  if(!voiceSupported()){
+    showVoiceToast('Dieser Browser stellt keine kompatible Spracherkennung bereit.');
+    return;
+  }
+  stopRecognition(true);
+  voiceState.mode=mode; voiceState.target=target; voiceState.section=section;
+  if(!keepExisting){ voiceState.finalText=''; voiceState.interimText=''; voiceState.changes={}; }
+  const rec=new SpeechRecognitionClass();
+  voiceState.recognition=rec;
+  rec.lang=VOICE_LANGUAGE;
+  rec.interimResults=true;
+  rec.continuous=(mode==='global'||mode==='section');
+  rec.maxAlternatives=1;
+  rec.onstart=()=>{
+    voiceState.listening=true; setVoiceStatus('Ich höre zu …',true);
+    $('#voice-stop').classList.remove('hidden'); $('#voice-next').classList.add('hidden'); $('#voice-apply').classList.add('hidden');
+    if(target){ const b=document.querySelector('.field-mic[data-voice-field="'+target+'"]'); if(b)b.classList.add('listening'); }
+  };
+  rec.onresult=(event)=>{
+    let interim='';
+    for(let i=event.resultIndex;i<event.results.length;i++){
+      const t=event.results[i][0].transcript.trim();
+      if(event.results[i].isFinal) voiceState.finalText+=(voiceState.finalText?' ':'')+t;
+      else interim+=(interim?' ':'')+t;
+    }
+    voiceState.interimText=interim;
+    renderVoiceTranscript();
+  };
+  rec.onerror=(event)=>{
+    const messages={"not-allowed":"Mikrofonzugriff wurde nicht erlaubt.","audio-capture":"Kein Mikrofon gefunden.","no-speech":"Keine Sprache erkannt.","network":"Spracherkennung derzeit nicht erreichbar."};
+    setVoiceStatus(messages[event.error]||('Fehler: '+event.error),false);
+  };
+  rec.onend=()=>{
+    voiceState.listening=false;
+    $$('.field-mic.listening').forEach(b=>b.classList.remove('listening'));
+    $('#voice-stop').classList.add('hidden');
+    processVoiceResult();
+  };
+  try{rec.start();}catch(e){setVoiceStatus('Spracherkennung konnte nicht gestartet werden.',false);}
+}
+function stopRecognition(silent=false){
+  const rec=voiceState.recognition; voiceState.recognition=null;
+  if(rec){ try{rec.onend=silent?null:rec.onend; rec.stop();}catch(e){} }
+  voiceState.listening=false;
+  if(!silent) setVoiceStatus('Auswertung läuft …',false);
+}
+function renderVoiceTranscript(){
+  const el=$('#voice-transcript');
+  const finalPart=escapeHtml(voiceState.finalText);
+  const interimPart=voiceState.interimText?' <span class="interim">'+escapeHtml(voiceState.interimText)+'</span>':'';
+  el.innerHTML=(finalPart||interimPart)?finalPart+interimPart:'Noch keine Sprache erkannt.';
+}
+function escapeHtml(v){return String(v??'').replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function normalText(v){return String(v||'').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[,:;]+/g,' ').replace(/\s+/g,' ').trim();}
+function titleCase(v){return String(v||'').trim().toLowerCase().replace(/(^|[\s-])(\p{L})/gu,(m,p1,p2)=>p1+p2.toUpperCase());}
+function pad2(n){return String(n).padStart(2,'0');}
+function toIsoDate(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function spokenDigits(v){
+  const map={null:'0',eins:'1',eine:'1',einen:'1',zwei:'2',drei:'3',vier:'4',fuenf:'5',funf:'5',sechs:'6',sieben:'7',acht:'8',neun:'9'};
+  let s=normalText(v).replace(/\b(null|eins|eine|einen|zwei|drei|vier|fuenf|funf|sechs|sieben|acht|neun)\b/g,m=>map[m]);
+  return s.replace(/[^0-9+]/g,'');
+}
+function cleanEmail(v){
+  return normalText(v).replace(/\s+at\s+|\s+aet\s+|\s+ät\s+/g,'@').replace(/\s+punkt\s+/g,'.').replace(/\s+minus\s+/g,'-').replace(/\s+unterstrich\s+/g,'_').replace(/\s+/g,'');
+}
+function parseDateText(v){
+  const n=normalText(v); const now=new Date(); now.setHours(12,0,0,0);
+  if(n.includes('uebermorgen')){now.setDate(now.getDate()+2);return toIsoDate(now)}
+  if(n.includes('morgen')){now.setDate(now.getDate()+1);return toIsoDate(now)}
+  if(n.includes('heute'))return toIsoDate(now);
+  let m=n.match(/\b(\d{1,2})[.\/-](\d{1,2})(?:[.\/-](\d{2,4}))?\b/);
+  if(m){let y=m[3]?Number(m[3]):now.getFullYear();if(y<100)y+=2000;return y+'-'+pad2(m[2])+'-'+pad2(m[1]);}
+  const months={januar:1,februar:2,maerz:3,marz:3,april:4,mai:5,juni:6,juli:7,august:8,september:9,oktober:10,november:11,dezember:12};
+  m=n.match(/\b(\d{1,2})\.?\s*(januar|februar|maerz|marz|april|mai|juni|juli|august|september|oktober|november|dezember)(?:\s+(\d{4}))?/);
+  if(m)return (m[3]||now.getFullYear())+'-'+pad2(months[m[2]])+'-'+pad2(m[1]);
+  return '';
+}
+function matchOption(text,options,aliases={}){
+  const n=normalText(text);
+  for(const [key,value] of Object.entries(aliases)) if(n.includes(normalText(key)))return value;
+  return options.find(o=>n.includes(normalText(o)))||'';
+}
+function captureAfter(text,markers,extraStops=[]){
+  const markerPattern=markers.map(m=>m.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+  const stops=[...ALL_FIELD_MARKERS,...extraStops].filter(x=>!markers.includes(x)).map(m=>m.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+  const re=new RegExp('(?:^|[,.]|\\b)(?:'+markerPattern+')[\\s:,-]*(.*?)(?=[,.]|\\b(?:'+stops+')\\b|$)','ig');
+  let m; const source=String(text||'');
+  while((m=re.exec(source))){const value=m[1].trim().replace(/[,.]+$/,'');if(value)return value;if(re.lastIndex===m.index)re.lastIndex++;}
+  return '';
+}
+function parseSingleField(key,text){
+  const raw=String(text||'').trim(), n=normalText(raw);
+  if(!raw||/^(ueberspringen|überspringen|keine|kein|nicht vorhanden|entfaellt|entfällt)$/.test(n))return '';
+  if(key==='art') return n.includes('repar')||n.includes('stoer')?'reparatur':n.includes('umbau')||n.includes('bestand')?'umbau':n.includes('neubau')?'neubau':'';
+  if(key==='tel'||key==='plz') return spokenDigits(raw);
+  if(key==='email') return cleanEmail(raw);
+  if(key==='termin') return parseDateText(raw);
+  if(key==='gebaeude')return matchOption(raw,GEBAEUDE,{einfamilien:'Einfamilienhaus',mehrfamilien:'Mehrfamilienhaus',gastronomie:'Gastronomie',gewerblich:'Gewerbe'});
+  if(key==='anlage')return matchOption(raw,ANLAGEN,{klima:'Klimaanlage',kaelte:'Kälteanlage',kalte:'Kälteanlage',waermepumpe:'Wärmepumpe',warmepumpe:'Wärmepumpe',lueftung:'Lüftung'});
+  if(key==='dring')return matchOption(raw,DRING,{sofort:'Dringend',eilig:'Dringend','komplett ausgefallen':'Ausgefallen',ausfall:'Ausgefallen'});
+  if(key==='betrieb')return n.includes('teil')?'Teilweise':n.includes('nicht')||n==='nein'?'Nein':n.includes('ja')||n.includes('laeuft')||n.includes('betrieb')?'Ja':'';
+  if(key==='zeitfenster')return matchOption(raw,ZEITFENSTER,{vormittags:'Vormittag',nachmittags:'Nachmittag','ganzer tag':'Ganztägig',ganztags:'Ganztägig'});
+  if(key==='leistung'){
+    const opts=[...new Set([...LEIST_BAU,...LEIST_REP])]; return opts.filter(o=>n.includes(normalText(o)));
+  }
+  if(key==='name'||key==='firma'||key==='ort')return titleCase(raw);
+  return raw;
+}
+function parseVoiceText(text,scope='global'){
+  const t=String(text||'').trim(), n=normalText(t), c={};
+  const allowed=scope==='global'?null:new Set(SECTION_FIELDS[scope]||[]);
+  const put=(k,v)=>{if(v!==''&&v!=null&&(!allowed||allowed.has(k)))c[k]=v;};
+  if(!allowed){put('art',parseSingleField('art',t));}
+  const named=[
+    ['name',['name','kunde','ansprechpartner']],['firma',['firma','verwaltung']],['tel',['telefon','handynummer','rufnummer']],
+    ['email',['e-mail','email','mailadresse']],['strasse',['straße','strasse','adresse']],['plz',['postleitzahl','plz']],['ort',['ort']],
+    ['objekt',['einsatzort','objekt']],['flaeche',['fläche','flaeche']],['bestand',['bestand','vorhandene technik']],
+    ['zeitraum',['ausführungszeitraum','ausfuehrungszeitraum','zeitraum']],['herstellerModell',['hersteller und modell','hersteller','modell']],
+    ['fehler',['problem','fehler','störung','stoerung']],['beschreibung',['notiz','beschreibung','besonderheit']]
+  ];
+  named.forEach(([k,m])=>{const v=captureAfter(t,m);if(v)put(k,parseSingleField(k,v));});
+  if((!allowed||allowed.has('plz'))&&!c.plz){const m=t.match(/\b\d{5}\b/);if(m)put('plz',m[0]);}
+  if(!allowed||allowed.has('gebaeude'))put('gebaeude',parseSingleField('gebaeude',t));
+  if(!allowed||allowed.has('anlage'))put('anlage',parseSingleField('anlage',t));
+  if(!allowed||allowed.has('dring'))put('dring',parseSingleField('dring',t));
+  if(!allowed||allowed.has('betrieb')){
+    if(/(?:anlage|geraet|gerät).{0,25}(?:nicht in betrieb|ausgefallen|laeuft nicht|läuft nicht)/i.test(t))put('betrieb','Nein');
+    else if(/(?:anlage|geraet|gerät).{0,25}(?:teilweise|eingeschraenkt|eingeschränkt)/i.test(t))put('betrieb','Teilweise');
+    else if(/(?:anlage|geraet|gerät).{0,25}(?:in betrieb|laeuft|läuft)/i.test(t))put('betrieb','Ja');
+  }
+  if(!allowed||allowed.has('leistung')){
+    const services=parseSingleField('leistung',t);if(services.length)put('leistung',services);
+  }
+  if(!allowed||allowed.has('termin')){const date=parseDateText(t);if(date)put('termin',date);}
+  if(!allowed||allowed.has('zeitfenster'))put('zeitfenster',parseSingleField('zeitfenster',t));
+  if((!allowed||allowed.has('flaeche'))&&!c.flaeche){const m=t.match(/\b\d+(?:[,.]\d+)?\s*(?:m²|qm|quadratmeter)(?:\s*(?:und|,)?\s*\d+\s*(?:räume|raeume))?/i);if(m)put('flaeche',m[0]);}
+  if((!allowed||allowed.has('beschreibung'))&&!c.beschreibung&&Object.keys(c).length===0)put('beschreibung',t);
+  if(c.objekt)put('abweichend',true);
+  return c;
+}
+function displayValue(key,value){
+  if(key==='art')return ART_LABEL[value]||value;
+  if(key==='termin')return deDate(value);
+  if(Array.isArray(value))return value.join(', ');
+  if(typeof value==='boolean')return value?'Ja':'Nein';
+  return String(value);
+}
+function previewVoiceChanges(changes){
+  voiceState.changes=changes||{};
+  const entries=Object.entries(voiceState.changes).filter(([,v])=>v!==''&&v!=null&&(!Array.isArray(v)||v.length));
+  const box=$('#voice-changes'),list=$('#voice-change-list');
+  if(!entries.length){
+    list.innerHTML='<div class="voice-empty">Es konnten keine Formularfelder sicher zugeordnet werden. Nutzen Sie Feldmikrofone oder nennen Sie Feldnamen, zum Beispiel: „Telefon 0173 …, Auftragsart Reparatur, Problem Anlage kühlt nicht“.</div>';
+    box.classList.remove('hidden'); $('#voice-apply').classList.add('hidden'); setVoiceStatus('Keine eindeutigen Angaben erkannt',false); return;
+  }
+  list.innerHTML=entries.map(([k,v])=>'<label class="voice-change"><input type="checkbox" data-change="'+escapeHtml(k)+'" checked><span><strong>'+escapeHtml(FIELD_LABELS[k]||k)+'</strong><span>'+escapeHtml(displayValue(k,v))+'</span></span></label>').join('');
+  box.classList.remove('hidden'); $('#voice-apply').classList.remove('hidden'); setVoiceStatus(entries.length+' Angabe'+(entries.length===1?'':'n')+' erkannt',false);
+}
+function setFormValue(key,value){
+  if(key==='art'){state.art=value;syncArt();persist();return;}
+  if(key==='leistung'){
+    state.leistung=[...new Set(value)];
+    $$('#leist-bau .chip,#leist-rep .chip').forEach(c=>c.classList.toggle('on',state.leistung.includes(c.dataset.val)));
+    persist();return;
+  }
+  if(key==='abweichend'){state.abweichend=!!value;syncAbw();persist();return;}
+  state[key]=value;
+  const el=$('[data-field="'+key+'"]');
+  if(el){el.value=value;clearErr(el);if(key==='beschreibung')$('#cnt').textContent=String(value).length;if(key==='plz')onPlz(value);}
+  if(key==='betrieb')$$('#betrieb-chips .chip').forEach(c=>c.classList.toggle('on',c.dataset.val===value));
+  if(key==='dring')$$('#dring-chips .chip').forEach(c=>{c.classList.toggle('on',c.dataset.val===value);c.classList.toggle('urgent',c.dataset.val===value&&(value==='Dringend'||value==='Ausgefallen'));});
+  persist();
+}
+function applySelectedVoiceChanges(){
+  const checked=$$('#voice-change-list input[data-change]:checked').map(i=>i.dataset.change);
+  checked.forEach(k=>setFormValue(k,voiceState.changes[k]));
+  closeVoiceLayer(); showVoiceToast(checked.length+' Angabe'+(checked.length===1?'':'n')+' übernommen.');
+}
+function processVoiceResult(){
+  const text=voiceState.finalText.trim(); renderVoiceTranscript();
+  if(!text){setVoiceStatus('Keine Sprache erkannt',false);if(voiceState.mode==='guided')$('#voice-next').classList.remove('hidden');return;}
+  if(voiceState.mode==='field'){
+    const value=parseSingleField(voiceState.target,text);
+    const c={}; if(value!==''&&(!Array.isArray(value)||value.length))c[voiceState.target]=value;
+    previewVoiceChanges(c); return;
+  }
+  if(voiceState.mode==='guided'){
+    const [key]=voiceState.guidedSteps[voiceState.guidedIndex];
+    const value=parseSingleField(key,text);
+    if(value!==''&&(!Array.isArray(value)||value.length))voiceState.guidedCollected[key]=value;
+    voiceState.guidedIndex++;
+    voiceState.finalText=''; voiceState.interimText='';
+    if(key==='art'&&value){setFormValue('art',value);voiceState.guidedSteps=guidedSteps();}
+    if(voiceState.guidedIndex>=voiceState.guidedSteps.length){
+      $('#voice-prompt').classList.add('hidden'); previewVoiceChanges(voiceState.guidedCollected);return;
+    }
+    renderGuidedPrompt();return;
+  }
+  previewVoiceChanges(parseVoiceText(text,voiceState.mode==='section'?voiceState.section:'global'));
+}
+function startGlobalVoice(){
+  resetVoiceUi(); openVoiceLayer('Kompletten Vorgang sprechen','Nennen Sie Feld und Inhalt möglichst zusammen, zum Beispiel: „Auftragsart Reparatur, Name Müller, Telefon …, Problem Anlage kühlt nicht“');
+  startRecognition({mode:'global'});
+}
+function startSectionVoice(section,title){
+  resetVoiceUi(); openVoiceLayer(title+' sprechen','Alle erkannten Angaben dieses Bereichs werden gemeinsam zur Übernahme angezeigt.');
+  startRecognition({mode:'section',section});
+}
+function startFieldVoice(key){
+  resetVoiceUi(); openVoiceLayer(FIELD_LABELS[key]+' diktieren','Gesprochener Inhalt wird ausschließlich diesem Feld zugeordnet.');
+  startRecognition({mode:'field',target:key});
+}
+function guidedSteps(){
+  const steps=[...GUIDED_BASE];
+  if(state.art==='reparatur')steps.push(['anlage','Um welche Anlagenart handelt es sich?'],['herstellerModell','Wie lauten Hersteller und Modell? Sagen Sie sonst: überspringen.'],['fehler','Was ist das Problem?'],['betrieb','Ist die Anlage noch in Betrieb: ja, nein oder teilweise?'],['dring','Wie dringend ist der Vorgang?']);
+  else steps.push(['gebaeude','Um welche Gebäudeart handelt es sich?'],['flaeche','Wie groß ist die Fläche oder wie viele Räume sind betroffen? Sagen Sie sonst: überspringen.'],['leistung','Welche Leistung wird gewünscht?']);
+  steps.push(['termin','Gibt es einen Wunschtermin? Sagen Sie sonst: überspringen.'],['zeitfenster','Welches Zeitfenster: Vormittag, Nachmittag oder ganztägig? Sagen Sie sonst: überspringen.'],['beschreibung','Welche zusätzliche Notiz soll gespeichert werden? Sagen Sie sonst: überspringen.']);
+  return steps;
+}
+function startGuidedVoice(){
+  resetVoiceUi(); voiceState.mode='guided'; voiceState.guidedCollected={}; voiceState.guidedIndex=0; voiceState.guidedSteps=guidedSteps();
+  openVoiceLayer('Geführte Spracherfassung','Das Formular wird Frage für Frage ausgefüllt. Nach jeder Frage tippen Sie auf „Antwort sprechen“.');
+  renderGuidedPrompt();
+}
+function renderGuidedPrompt(){
+  const step=voiceState.guidedSteps[voiceState.guidedIndex];
+  if(!step){previewVoiceChanges(voiceState.guidedCollected);return;}
+  $('#voice-prompt').textContent=(voiceState.guidedIndex+1)+'/'+voiceState.guidedSteps.length+': '+step[1];
+  $('#voice-prompt').classList.remove('hidden');
+  $('#voice-transcript').textContent='Noch keine Antwort erkannt.';
+  $('#voice-next').classList.remove('hidden'); $('#voice-apply').classList.add('hidden'); $('#voice-changes').classList.add('hidden');
+  setVoiceStatus('Bereit für die nächste Antwort',false);
+  if('speechSynthesis' in window){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(step[1]);u.lang=VOICE_LANGUAGE;u.rate=.98;speechSynthesis.speak(u);}catch(e){}}
+}
+function startGuidedAnswer(){
+  const step=voiceState.guidedSteps[voiceState.guidedIndex]; if(!step)return;
+  voiceState.finalText='';voiceState.interimText='';$('#voice-transcript').textContent='Ich höre zu …';
+  startRecognition({mode:'guided',target:step[0],keepExisting:true});
+}
+function installFieldMicrophones(){
+  $$('[data-field]').forEach(el=>{
+    const key=el.dataset.field;
+    if(!FIELD_LABELS[key]||el.type==='date')return;
+    const field=el.closest('.field'); if(!field||field.querySelector('.field-mic'))return;
+    field.classList.add('voice-field');
+    const btn=document.createElement('button');btn.type='button';btn.className='field-mic'+(field.querySelector('label.f')?'':' compact');btn.dataset.voiceField=key;btn.title=FIELD_LABELS[key]+' per Sprache erfassen';btn.setAttribute('aria-label',btn.title);btn.innerHTML=VOICE_ICON;
+    btn.addEventListener('click',()=>startFieldVoice(key));field.appendChild(btn);
+  });
+}
+function installSectionMicrophones(){
+  const definitions=[['Kontakt','kontakt'],['Technik','technik'],['Termin & Notiz','termin']];
+  definitions.forEach(([label,key])=>{
+    const p=$$('p.lbl-sec').find(x=>x.textContent.trim()===label);if(!p||p.parentElement.querySelector('.section-mic'))return;
+    const wrap=document.createElement('div');wrap.className='section-headline';p.parentNode.insertBefore(wrap,p);wrap.appendChild(p);
+    const b=document.createElement('button');b.type='button';b.className='section-mic';b.innerHTML=VOICE_ICON+' Bereich sprechen';b.addEventListener('click',()=>startSectionVoice(key,label));wrap.appendChild(b);
+  });
+}
+function initVoice(){
+  installFieldMicrophones();installSectionMicrophones();
+  const support=$('#voice-support');
+  if(voiceSupported()){support.textContent='Spracherkennung in diesem Browser erkannt.';support.className='voice-support ok';}
+  else{support.textContent='Spracherkennung in diesem Browser nicht verfügbar. Bitte einen kompatiblen Browser testen.';support.className='voice-support bad';$('#voice-global').disabled=true;$('#voice-guided').disabled=true;}
+  $('#voice-global').addEventListener('click',startGlobalVoice);
+  $('#voice-guided').addEventListener('click',startGuidedVoice);
+  $('#voice-stop').addEventListener('click',()=>stopRecognition(false));
+  $('#voice-next').addEventListener('click',startGuidedAnswer);
+  $('#voice-apply').addEventListener('click',applySelectedVoiceChanges);
+  $('#voice-close').addEventListener('click',closeVoiceLayer);
+  $('#voice-cancel').addEventListener('click',closeVoiceLayer);
+  $('#voice-layer').addEventListener('click',e=>{if(e.target.id==='voice-layer')closeVoiceLayer();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#voice-layer').classList.contains('hidden'))closeVoiceLayer();});
+}
+initVoice();
+
 
 /* ---------- Events ---------- */
 $('#btn-weiter').addEventListener('click',showSummary);
