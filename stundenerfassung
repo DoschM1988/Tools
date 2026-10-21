@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Regiezettel</title>
+<meta name="theme-color" content="#2f5d3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Regiezettel">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232f5d3a'/%3E%3Ccircle cx='50' cy='56' r='26' fill='none' stroke='%23e9d9a6' stroke-width='8'/%3E%3Cpath d='M28 56h44M50 30v52' stroke='%23e9d9a6' stroke-width='5'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232f5d3a'/%3E%3Ccircle cx='50' cy='56' r='26' fill='none' stroke='%23e9d9a6' stroke-width='8'/%3E%3Cpath d='M28 56h44M50 30v52' stroke='%23e9d9a6' stroke-width='5'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f4f2ec; --card:#ffffff; --ink:#1f2420; --muted:#6b726c; --line:#dcd8cc;
+  --accent:#2f5d3a; --accent-ink:#ffffff; --heu:#c9a227; --stroh:#d8c58a; --warn:#b5541c; --ok:#2f7d4a;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141714; --card:#1e221f; --ink:#ecefe9; --muted:#9aa29b; --line:#333a35;
+    --accent:#5f9e6d; --accent-ink:#0e130f; --heu:#d9b43d; --stroh:#c9b67a; --warn:#e08a4f; --ok:#5fbf7f;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141714; --card:#1e221f; --ink:#ecefe9; --muted:#9aa29b; --line:#333a35;
+  --accent:#5f9e6d; --accent-ink:#0e130f; --heu:#d9b43d; --stroh:#c9b67a; --warn:#e08a4f; --ok:#5fbf7f;
+}
+*{box-sizing:border-box}
+html,body{margin:0;overflow-x:hidden;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:17px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding:0 16px calc(96px + env(safe-area-inset-bottom));-webkit-tap-highlight-color:transparent}
+header{display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) 0 10px}
+header h1{font-size:20px;margin:0}
+.pill{font-size:13px;padding:4px 10px;border-radius:99px;background:var(--warn);color:#fff;font-weight:600}
+.pill.ok{background:var(--ok)}
+main{max-width:560px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}
+.card h2{font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 10px}
+label.lbl{display:block;font-size:14px;color:var(--muted);margin:0 0 6px}
+input[type=date],input[type=text],input[type=email],textarea,select{
+  display:block;width:100%;max-width:100%;min-width:0;-webkit-appearance:none;appearance:none;font:inherit;font-size:17px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;min-height:48px}
+textarea{min-height:70px;resize:none}
+input[type=date]{text-align:left;line-height:22px}
+input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0}
+input[type=date]::-webkit-calendar-picker-indicator{opacity:.6}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+.card,.rrow,main{min-width:0;max-width:100%}
+.step output{flex:none}
+.step button,.x,.seg button{flex-shrink:0;touch-action:manipulation}
+.row{display:flex;gap:10px;align-items:center}
+.rrow{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px;background:var(--bg)}
+.rrow .top{display:flex;gap:8px}
+.rrow .top select{flex:1;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;font-size:17px}
+.x{width:48px;min-height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:22px}
+.seg{display:flex;gap:8px;margin-top:10px}
+.seg button{flex:1 1 0;min-width:0;min-height:48px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:600}
+.seg button.on.heu{border-color:var(--heu);background:var(--heu);color:#1d1a0c}
+.seg button.on.stroh{border-color:var(--stroh);background:var(--stroh);color:#1d1a0c}
+.step{display:flex;align-items:center;gap:8px;margin-top:10px}
+.step .lab{flex:1;font-size:15px;color:var(--muted)}
+.step button{width:52px;height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:24px;font-weight:600}
+.step output{min-width:64px;text-align:center;font-size:22px;font-weight:700}
+.add{width:100%;min-height:48px;border-radius:10px;border:2px dashed var(--accent);background:transparent;color:var(--accent);font:inherit;font-weight:600}
+.toggle{display:flex;align-items:center;justify-content:space-between;min-height:52px;cursor:pointer}
+.toggle input{width:28px;height:28px;accent-color:var(--accent)}
+.btn{width:100%;min-height:54px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:700;font-size:18px}
+.btn.sec{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.warn{background:var(--warn);color:#fff}
+.btn+.btn{margin-top:10px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;min-height:60px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:600}
+nav button.on{color:var(--accent)}
+.entry{padding:12px 0;border-top:1px solid var(--line)}
+.entry:first-child{border-top:0}
+.entry .head{display:flex;justify-content:space-between;gap:8px;font-weight:700}
+.entry .meta{color:var(--muted);font-size:15px;margin-top:3px}
+.entry .acts{display:flex;gap:8px;margin-top:8px}
+.entry .acts button{flex:1;min-height:42px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:15px}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;font-weight:700;white-space:nowrap}
+.tag.open{background:var(--warn);color:#fff}.tag.sent{background:var(--line);color:var(--muted)}.tag.storno{background:#7a2b2b;color:#fff}
+.muted{color:var(--muted);font-size:15px}
+.hidden{display:none!important}
+dialog{border:0;border-radius:16px;padding:18px;width:min(92vw,480px);background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+pre{white-space:pre-wrap;font-size:13px;background:var(--bg);border-radius:10px;padding:10px;max-height:40vh;overflow:auto}
+.toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-weight:600;white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+.werbtn{border:0;background:transparent;color:var(--accent);font:inherit;font-size:15px;font-weight:600;padding:2px 0;cursor:pointer}
+.werlist{display:grid;gap:10px;margin-top:12px}
+.werlist button{min-height:54px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:18px;font-weight:600}
+.werlist button.on{border:2px solid var(--accent)}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div><h1>Regiezettel</h1><button id="werBtn" class="werbtn">–</button></div>
+  <span id="badge" class="pill hidden"></span>
+</header>
+
+<!-- ERFASSEN -->
+<section id="v-erfassen">
+  <div id="editHint" class="card hidden" style="border-color:var(--warn)">
+    <b>Eintrag wird bearbeitet.</b> <span class="muted">Nach dem Speichern wird er beim nächsten Senden neu übermittelt.</span>
+  </div>
+  <div class="card">
+    <label class="lbl" for="f-datum">Datum</label>
+    <input type="date" id="f-datum">
+  </div>
+
+  <div class="card">
+    <h2>Raufen befüllt</h2>
+    <div id="raufen"></div>
+    <button class="add" id="addRaufe">+ Raufe hinzufügen</button>
+  </div>
+
+  <div class="card">
+    <h2>Stunden</h2>
+    <div class="step"><span class="lab">Mannstunden</span>
+      <button data-s="mann" data-d="-0.25">−</button><output id="o-mann">0</output><button data-s="mann" data-d="0.25">+</button></div>
+    <div class="step"><span class="lab">Laderstunden</span>
+      <button data-s="lader" data-d="-0.25">−</button><output id="o-lader">0</output><button data-s="lader" data-d="0.25">+</button></div>
+    <label class="toggle" style="margin-top:8px"><span>Mist gefahren</span><input type="checkbox" id="f-mist"></label>
+  </div>
+
+  <div class="card">
+    <label class="lbl" for="f-notiz">Bemerkung (optional)</label>
+    <textarea id="f-notiz" placeholder="z. B. Raufe 3 Netz kaputt"></textarea>
+  </div>
+
+  <button class="btn" id="save">Eintrag speichern</button>
+  <button class="btn sec hidden" id="cancelEdit">Bearbeiten abbrechen</button>
+</section>
+
+<!-- EINTRÄGE -->
+<section id="v-liste" class="hidden">
+  <button class="btn" id="sendBtn">Offene Einträge senden</button>
+  <p class="muted" id="sendInfo" style="margin:8px 2px 14px"></p>
+  <div class="card"><h2>Noch nicht gesendet</h2><div id="l-open"></div></div>
+  <div class="card"><h2>Gesendet</h2><div id="l-sent"></div></div>
+</section>
+
+<!-- EINSTELLUNGEN -->
+<section id="v-setup" class="hidden">
+  <div class="card">
+    <label class="lbl" for="s-name">Wer erfasst</label>
+    <select id="s-name"></select>
+    <label class="lbl" for="s-to" style="margin-top:12px">Senden an (E-Mail)</label>
+    <input type="email" id="s-to" placeholder="name@beispiel.de">
+  </div>
+  <div class="card">
+    <h2>Raufen</h2>
+    <p class="muted" style="margin-top:0">Eine Raufe pro Zeile.</p>
+    <textarea id="s-raufen" rows="8"></textarea>
+  </div>
+  <button class="btn" id="saveSetup">Einstellungen speichern</button>
+  <p class="muted" style="margin-top:16px">Tipp: Über „Teilen → Zum Home-Bildschirm“ wird das Tool wie eine App aufs Handy gelegt.</p>
+</section>
+</main>
+
+<nav>
+  <button data-v="erfassen" class="on">Erfassen</button>
+  <button data-v="liste">Einträge</button>
+  <button data-v="setup">Einstellungen</button>
+</nav>
+
+<dialog id="dlg">
+  <h3 style="margin-top:0" id="d-title">Senden</h3>
+  <p class="muted" id="d-text"></p>
+  <pre id="d-pre"></pre>
+  <button class="btn" id="d-mail">Per E-Mail senden</button>
+  <button class="btn sec" id="d-share">Teilen (WhatsApp, Mail …)</button>
+  <button class="btn sec" id="d-copy">Text kopieren</button>
+  <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+  <button class="btn" id="d-done" style="background:var(--ok);color:#fff">Ist gesendet ✓ als erledigt markieren</button>
+  <button class="btn sec" id="d-close">Abbrechen</button>
+</dialog>
+<dialog id="werDlg">
+  <h3 style="margin-top:0">Wer erfasst?</h3>
+  <p class="muted" style="margin:0">Einmal auswählen, das Handy merkt es sich.</p>
+  <div class="werlist" id="werList"></div>
+</dialog>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+const KEY='doschRegie_v1';
+// Feste Auswahl – hier erweitern:
+const PERSONEN=['Georg Baur','Leonhard Ascherl','Michael Dosch'];
+const DEF_TO='info@dosch-hof.de';
+const DEF_RAUFEN=['Raufe 1 – Heu links innen','Raufe 2 – Stroh links innen','Raufe 3 – Große Raufe Mitte','Raufe 4 – Heu rechts innen','Raufe 5 – Pony-Offenstall','Raufe 8 – Große Eisenraufe','Raufe 9 – Kleine Raufe neben Eisenraufe','Raufe 10 – Lisa rechts oben','Raufe 11 – Strohraufe links oben'];
+const PREV_DEF=['Raufe 1 – Heuraufe links','Raufe 2 – Strohraufe','Raufe 3 – Große Raufe Mitte','Raufe 4 – Rechts innen','Raufe 5 – Ponys rechts','Raufe 8 – Lisa-Seite links (Eisenrohre)','Raufe 9 – Kaltblüter (neu)','Raufe 10 – Lisa oben','Raufe 11 – Strohraufe links'];
+const OLD_DEF=['Raufe 1','Raufe 2','Raufe 3','Raufe 4','Raufe 5','Raufe 6','Raufe 7','Raufe 8'];
+let S={settings:{name:'',to:DEF_TO,raufen:DEF_RAUFEN.slice()},entries:[]};
+let storeOk=true;
+
+function load(){try{const r=localStorage.getItem(KEY);if(r){const p=JSON.parse(r);if(p&&p.settings)S=p;}}catch(e){storeOk=false;}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){storeOk=false;toast('Speichern im Browser nicht möglich!');}}
+load();
+if(!S.settings.to) S.settings.to=DEF_TO;
+if(!S.settings.raufen||!S.settings.raufen.length||S.settings.raufen.join('|')===OLD_DEF.join('|')||S.settings.raufen.join('|')===PREV_DEF.join('|')){S.settings.raufen=DEF_RAUFEN.slice();try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+// Voreinstellung per Link: ?to=mail&name=Name&raufen=A|B|C  (nur beim ersten Öffnen)
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(S._init) return;
+  if(q.get('to')) S.settings.to=q.get('to');
+  if(q.get('name')) S.settings.name=q.get('name');
+  if(q.get('raufen')){const l=q.get('raufen').split('|').map(s=>s.trim()).filter(Boolean);if(l.length)S.settings.raufen=l;}
+  S._init=true; save();
+})();
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>(Math.round(n*100)/100).toLocaleString('de-DE');
+const today=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10);};
+const dDE=iso=>{const [y,m,d]=iso.split('-');const wd=['So','Mo','Di','Mi','Do','Fr','Sa'][new Date(+y,m-1,+d).getDay()];return wd+' '+d+'.'+m+'.'+y;};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800);}
+
+// ---------- Formular ----------
+let F, editId=null;
+function blank(){return{datum:today(),raufen:[],mann:0,lader:0,mist:false,notiz:''};}
+function setForm(f){
+  F=JSON.parse(JSON.stringify(f));
+  $('f-datum').value=F.datum; $('f-mist').checked=F.mist; $('f-notiz').value=F.notiz;
+  renderRaufen(); renderSteps();
+  $('editHint').classList.toggle('hidden',!editId);
+  $('cancelEdit').classList.toggle('hidden',!editId);
+  $('save').textContent=editId?'Änderung speichern':'Eintrag speichern';
+}
+function renderSteps(){$('o-mann').textContent=fmt(F.mann);$('o-lader').textContent=fmt(F.lader);}
+function renderRaufen(){
+  const box=$('raufen'); box.innerHTML='';
+  if(!F.raufen.length){box.innerHTML='<p class="muted" style="margin:0 0 10px">Keine Raufe – nur Stunden? Dann einfach weiter unten eintragen.</p>';}
+  F.raufen.forEach((r,i)=>{
+    const opts=S.settings.raufen.slice(); if(r.raufe&&!opts.includes(r.raufe)) opts.unshift(r.raufe);
+    const d=document.createElement('div'); d.className='rrow';
+    d.innerHTML=`<div class="top"><select data-i="${i}" class="r-sel">${opts.map(o=>`<option ${o===r.raufe?'selected':''}>${esc(o)}</option>`).join('')}</select>
+      <button class="x" data-del="${i}" aria-label="Entfernen">×</button></div>
+      <div class="seg"><button class="heu ${r.art==='Heu'?'on':''}" data-art="Heu" data-i="${i}">Heu</button>
+      <button class="stroh ${r.art==='Stroh'?'on':''}" data-art="Stroh" data-i="${i}">Stroh</button></div>
+      <div class="step"><span class="lab">Rundballen</span><button data-b="-1" data-i="${i}">−</button><output>${r.ballen}</output><button data-b="1" data-i="${i}">+</button></div>`;
+    box.appendChild(d);
+  });
+}
+$('raufen').addEventListener('click',e=>{
+  const t=e.target.closest('button'); if(!t) return; const i=+t.dataset.i;
+  if(t.dataset.del!==undefined){F.raufen.splice(+t.dataset.del,1);renderRaufen();return;}
+  if(t.dataset.art){F.raufen[i].art=t.dataset.art;renderRaufen();return;}
+  if(t.dataset.b){F.raufen[i].ballen=Math.max(1,F.raufen[i].ballen+ +t.dataset.b);renderRaufen();}
+});
+$('raufen').addEventListener('change',e=>{if(e.target.classList.contains('r-sel')){const r=F.raufen[+e.target.dataset.i];r.raufe=e.target.value;r.art=/stroh/i.test(r.raufe)?'Stroh':'Heu';renderRaufen();}});
+$('addRaufe').onclick=()=>{
+  const used=F.raufen.map(r=>r.raufe); const next=S.settings.raufen.find(r=>!used.includes(r))||S.settings.raufen[0]||'Raufe';
+  F.raufen.push({raufe:next,art:/stroh/i.test(next)?'Stroh':'Heu',ballen:1}); renderRaufen();
+};
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;F[k]=Math.max(0,Math.round((F[k]+ +b.dataset.d)*100)/100);renderSteps();});
+
+$('save').onclick=()=>{
+  F.datum=$('f-datum').value||today(); F.mist=$('f-mist').checked; F.notiz=$('f-notiz').value.trim();
+  if(!S.settings.name){openWer();return;}
+  if(!F.raufen.length && !F.mann && !F.lader && !F.mist){toast('Bitte etwas eintragen');return;}
+  if(editId){
+    const e=S.entries.find(x=>x.id===editId);
+    Object.assign(e,{datum:F.datum,raufen:F.raufen,mann:F.mann,lader:F.lader,mist:F.mist,notiz:F.notiz});
+    if(e.gesendet){e.rev=(e.rev||1)+1;e.gesendet=false;}
+    editId=null; toast('Änderung gespeichert');
+  }else{
+    S.entries.push({id:uid(),rev:1,wer:S.settings.name,datum:F.datum,raufen:F.raufen,mann:F.mann,lader:F.lader,mist:F.mist,notiz:F.notiz,storno:false,gesendet:false,erstellt:new Date().toISOString()});
+    toast('Gespeichert ✓');
+  }
+  save(); setForm(blank()); updateBadge();
+};
+$('cancelEdit').onclick=()=>{editId=null;setForm(blank());};
+
+// ---------- Liste ----------
+function raufText(e){return e.raufen.map(r=>`${r.raufe}: ${r.ballen}× ${r.art}`).join(', ');}
+function entryHTML(e){
+  const tag=e.storno?'<span class="tag storno">storniert</span>':(e.gesendet?'<span class="tag sent">gesendet</span>':'<span class="tag open">offen</span>');
+  const bits=[]; if(e.mann)bits.push(`Mann ${fmt(e.mann)} h`); if(e.lader)bits.push(`Lader ${fmt(e.lader)} h`); if(e.mist)bits.push('Mist gefahren');
+  const acts=e.storno?'':`<div class="acts"><button data-edit="${e.id}">Bearbeiten</button><button data-del="${e.id}">${e.gesendet?'Stornieren':'Löschen'}</button></div>`;
+  return `<div class="entry"><div class="head"><span>${dDE(e.datum)}${e.wer?' · '+esc(e.wer):''}</span>${tag}</div>
+    <div class="meta">${esc(bits.join(' · ')||'–')}</div>
+    ${e.raufen.length?`<div class="meta">${esc(raufText(e))}</div>`:''}
+    ${e.notiz?`<div class="meta"><i>${esc(e.notiz)}</i></div>`:''}${acts}</div>`;
+}
+function renderList(){
+  const sorted=S.entries.slice().sort((a,b)=>b.datum.localeCompare(a.datum));
+  const open=sorted.filter(e=>!e.gesendet), sent=sorted.filter(e=>e.gesendet).slice(0,40);
+  $('l-open').innerHTML=open.length?open.map(entryHTML).join(''):'<p class="muted" style="margin:0">Alles gesendet ✓</p>';
+  $('l-sent').innerHTML=sent.length?sent.map(entryHTML).join(''):'<p class="muted" style="margin:0">Noch nichts gesendet.</p>';
+  $('sendBtn').disabled=!open.length; $('sendBtn').style.opacity=open.length?1:.5;
+  $('sendInfo').textContent=open.length?`${open.length} Eintrag/Einträge warten auf Versand.`:'';
+}
+$('v-liste').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.edit){const en=S.entries.find(x=>x.id===b.dataset.edit);editId=en.id;
+    setForm({datum:en.datum,raufen:en.raufen,mann:en.mann,lader:en.lader,mist:en.mist,notiz:en.notiz});show('erfassen');}
+  if(b.dataset.del){const en=S.entries.find(x=>x.id===b.dataset.del);
+    if(en.gesendet){if(confirm('Eintrag stornieren? Die Stornierung wird beim nächsten Senden übermittelt.')){en.storno=true;en.rev=(en.rev||1)+1;en.gesendet=false;}}
+    else if(confirm('Eintrag löschen?')){S.entries=S.entries.filter(x=>x!==en);}
+    save();renderList();updateBadge();}
+});
+
+// ---------- Senden ----------
+const clean=s=>String(s).replace(/[;|:\r\n]/g,' ').trim();
+function buildMessage(list){
+  const wers=[...new Set(list.map(e=>e.wer||S.settings.name).filter(Boolean))];
+  const name=wers.join(', ')||'unbekannt';
+  const ds=list.map(e=>e.datum).sort();
+  const subj=`Regiezettel ${name} – ${list.length} Einträge (${dDE(ds[0]).slice(3)} bis ${dDE(ds[ds.length-1]).slice(3)})`;
+  let sm=0,sl=0,heu=0,str=0,mist=0;
+  let t=`Regiezettel von ${name}\n\n`;
+  list.slice().sort((a,b)=>a.datum.localeCompare(b.datum)).forEach(e=>{
+    if(e.storno){t+=`${dDE(e.datum)}: STORNIERT\n\n`;return;}
+    sm+=e.mann;sl+=e.lader;if(e.mist)mist++;
+    e.raufen.forEach(r=>{if(r.art==='Heu')heu+=r.ballen;else str+=r.ballen;});
+    t+=`${dDE(e.datum)}${wers.length>1?' – '+(e.wer||''):''}${e.rev>1?' (Korrektur)':''}: Mann ${fmt(e.mann)} h, Lader ${fmt(e.lader)} h, Mist: ${e.mist?'ja':'nein'}\n`;
+    if(e.raufen.length)t+=`  ${raufText(e)}\n`;
+    if(e.notiz)t+=`  Notiz: ${e.notiz}\n`;
+    t+='\n';
+  });
+  t+=`Summe: Mann ${fmt(sm)} h · Lader ${fmt(sl)} h · Heu ${heu} Ballen · Stroh ${str} Ballen · Mist ${mist}×\n\n`;
+  t+='----- Daten (bitte nicht ändern) -----\n#DOSCH-REGIE v1\nid;rev;datum;mannstd;laderstd;mist;raufen;bemerkung;storno;wer\n';
+  list.forEach(e=>{
+    const rf=e.raufen.map(r=>`${clean(r.raufe)}:${r.art==='Heu'?'H':'S'}${r.ballen}`).join('|');
+    t+=[e.id,e.rev||1,e.datum,e.mann,e.lader,e.mist?1:0,rf,clean(e.notiz||''),e.storno?1:0,clean(e.wer||S.settings.name||'')].join(';')+'\n';
+  });
+  t+='#ENDE\n';
+  return {subj,text:t};
+}
+let pending=null;
+$('sendBtn').onclick=()=>{
+  const open=S.entries.filter(e=>!e.gesendet); if(!open.length) return;
+  pending={ids:open.map(e=>e.id+'@'+(e.rev||1)),msg:buildMessage(open)};
+  $('d-title').textContent=`${open.length} Einträge senden`;
+  $('d-text').textContent=S.settings.to?`An: ${S.settings.to}`:'Keine Empfänger-Adresse hinterlegt – bitte in den Einstellungen eintragen oder „Teilen“ nutzen.';
+  $('d-pre').textContent=pending.msg.text;
+  $('d-share').classList.toggle('hidden',!navigator.share);
+  $('dlg').showModal();
+};
+$('d-mail').onclick=()=>{location.href=`mailto:${encodeURIComponent(S.settings.to||'')}?subject=${encodeURIComponent(pending.msg.subj)}&body=${encodeURIComponent(pending.msg.text)}`;};
+$('d-share').onclick=async()=>{try{await navigator.share({title:pending.msg.subj,text:pending.msg.subj+'\n\n'+pending.msg.text});}catch(e){}};
+$('d-copy').onclick=async()=>{try{await navigator.clipboard.writeText(pending.msg.subj+'\n\n'+pending.msg.text);toast('Kopiert');}catch(e){toast('Kopieren nicht möglich');}};
+$('d-done').onclick=()=>{
+  S.entries.forEach(e=>{if(pending.ids.includes(e.id+'@'+(e.rev||1)))e.gesendet=true;});
+  save();$('dlg').close();renderList();updateBadge();toast('Als gesendet markiert ✓');
+};
+$('d-close').onclick=()=>$('dlg').close();
+
+// ---------- Einstellungen ----------
+function renderSetup(){$('s-name').innerHTML=PERSONEN.map(p=>`<option ${p===S.settings.name?'selected':''}>${esc(p)}</option>`).join('');$('s-to').value=S.settings.to;$('s-raufen').value=S.settings.raufen.join('\n');}
+$('saveSetup').onclick=()=>{
+  S.settings.name=$('s-name').value.trim(); S.settings.to=$('s-to').value.trim();
+  const l=$('s-raufen').value.split('\n').map(s=>s.trim()).filter(Boolean); S.settings.raufen=l.length?l:DEF_RAUFEN.slice();
+  save(); toast('Gespeichert ✓'); renderRaufen(); renderWer();
+};
+
+// ---------- Wer erfasst ----------
+function renderWer(){$('werBtn').textContent=S.settings.name?('Erfasst von: '+S.settings.name+' ▾'):'Wer erfasst? ▾';}
+function openWer(){
+  $('werList').innerHTML=PERSONEN.map(p=>`<button data-wer="${esc(p)}" class="${p===S.settings.name?'on':''}">${esc(p)}</button>`).join('');
+  $('werDlg').showModal();
+}
+$('werList').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  S.settings.name=b.dataset.wer;save();renderWer();$('werDlg').close();toast('Hallo '+S.settings.name);});
+$('werDlg').addEventListener('cancel',e=>{if(!S.settings.name)e.preventDefault();});
+$('werBtn').onclick=openWer;
+
+// ---------- Navigation ----------
+function show(v){
+  ['erfassen','liste','setup'].forEach(x=>$('v-'+x).classList.toggle('hidden',x!==v));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  if(v==='liste')renderList(); if(v==='setup')renderSetup(); window.scrollTo(0,0);
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.v));
+function updateBadge(){
+  const n=S.entries.filter(e=>!e.gesendet).length, b=$('badge');
+  b.classList.remove('hidden'); b.classList.toggle('ok',!n);
+  b.textContent=n?`${n} noch nicht gesendet`:'alles gesendet';
+  if(!storeOk){b.classList.remove('ok');b.textContent='Speicher gesperrt!';}
+}
+setForm(blank()); updateBadge(); renderWer();
+if(!PERSONEN.includes(S.settings.name)){S.settings.name='';openWer();}
+})();
+</script>
+</body>
+</html>
