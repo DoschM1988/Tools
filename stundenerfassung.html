@@ -86,6 +86,13 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 pre{white-space:pre-wrap;font-size:13px;background:var(--bg);border-radius:10px;padding:10px;max-height:40vh;overflow:auto}
 .toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-weight:600;white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}
+.tmr{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0 4px;padding:8px 10px;border-radius:10px;background:var(--bg);border:1px dashed var(--line)}
+.tmr.run{border:1px solid var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--bg))}
+.tmr .clk{flex:1 1 120px;font-variant-numeric:tabular-nums;font-size:20px;font-weight:700;min-width:0}
+.tmr .clk small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
+.tmr button{min-height:44px;min-width:44px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:15px;font-weight:600;flex-shrink:0}
+.tmr .btns{display:flex;gap:8px;margin-left:auto}.tmr.multi .btns{flex:1 1 100%;margin-left:0}.tmr.multi .btns button{flex:1}.tmr.multi .btns button.x{flex:0 0 48px}
+.tmr button.go{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .werbtn{border:0;background:transparent;color:var(--accent);font:inherit;font-size:15px;font-weight:600;padding:2px 0;cursor:pointer}
 .werlist{display:grid;gap:10px;margin-top:12px}
 .werlist button{min-height:54px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:18px;font-weight:600}
@@ -101,6 +108,7 @@ pre{white-space:pre-wrap;font-size:13px;background:var(--bg);border-radius:10px;
 
 <!-- ERFASSEN -->
 <section id="v-erfassen">
+  <div id="draftHint" class="card hidden" style="border-color:var(--accent)"><b>Entwurf wiederhergestellt.</b> <span class="muted">Deine angefangene Eingabe war zwischengespeichert.</span> <button class="werbtn" id="draftDrop">Verwerfen</button></div>
   <div id="editHint" class="card hidden" style="border-color:var(--warn)">
     <b>Eintrag wird bearbeitet.</b> <span class="muted">Nach dem Speichern wird er beim nächsten Senden neu übermittelt.</span>
   </div>
@@ -119,8 +127,10 @@ pre{white-space:pre-wrap;font-size:13px;background:var(--bg);border-radius:10px;
     <h2>Stunden</h2>
     <div class="step"><span class="lab">Mannstunden</span>
       <button data-s="mann" data-d="-0.25">−</button><output id="o-mann">0</output><button data-s="mann" data-d="0.25">+</button></div>
+    <div class="tmr" id="t-mann"></div>
     <div class="step"><span class="lab">Laderstunden</span>
       <button data-s="lader" data-d="-0.25">−</button><output id="o-lader">0</output><button data-s="lader" data-d="0.25">+</button></div>
+    <div class="tmr" id="t-lader"></div>
     <label class="toggle" style="margin-top:8px"><span>Mist gefahren</span><input type="checkbox" id="f-mist"></label>
   </div>
 
@@ -230,7 +240,33 @@ function setForm(f){
   $('cancelEdit').classList.toggle('hidden',!editId);
   $('save').textContent=editId?'Änderung speichern':'Eintrag speichern';
 }
-function renderSteps(){$('o-mann').textContent=fmt(F.mann);$('o-lader').textContent=fmt(F.lader);}
+function renderSteps(){$('o-mann').textContent=fmt(F.mann);$('o-lader').textContent=fmt(F.lader);persistDraft();}
+// ---------- Zwischenspeichern ----------
+let draftReady=false;
+function isBlankF(){return !F||(!F.raufen.length&&!F.mann&&!F.lader&&!F.mist&&!F.notiz);}
+function persistDraft(){if(!draftReady||!F)return;S.draft=isBlankF()&&!editId?null:{F:JSON.parse(JSON.stringify(F)),editId};save();}
+// ---------- Stoppuhren ----------
+S.timer=S.timer||{mann:{acc:0,start:null},lader:{acc:0,start:null}};
+['mann','lader'].forEach(k=>{S.timer[k]=S.timer[k]||{acc:0,start:null};});
+const tMs=k=>{const t=S.timer[k];return t.acc+(t.start?Date.now()-t.start:0);};
+const tFmt=ms=>{const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(x).padStart(2,'0');};
+const tHours=ms=>{const min=ms/60000;if(min<1)return 0;return Math.max(0.25,Math.round(min/15)/4);};
+function renderTimer(k){
+  const el=$('t-'+k),t=S.timer[k],ms=tMs(k),run=!!t.start,has=ms>0;
+  el.classList.toggle('run',run);el.classList.toggle('multi',has);
+  el.innerHTML=`<span class="clk">${tFmt(ms)}<small>${run?'läuft':has?'pausiert':'Stoppuhr'}${tHours(ms)?' · ≈ '+fmt(tHours(ms))+' h':''}</small></span><span class="btns">
+    <button data-t="${k}" data-ta="${run?'pause':'start'}" class="${run?'':'go'}">${run?'Pause':has?'Weiter':'Start'}</button>
+    ${has?`<button data-t="${k}" data-ta="take">Übernehmen</button><button data-t="${k}" data-ta="reset" class="x" aria-label="Zurücksetzen">✕</button>`:''}</span>`;
+}
+function renderTimers(){renderTimer('mann');renderTimer('lader');}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-ta]');if(!b)return;const k=b.dataset.t,a=b.dataset.ta,t=S.timer[k];
+  if(a==='start'){t.start=Date.now();}
+  else if(a==='pause'){if(t.start){t.acc+=Date.now()-t.start;t.start=null;}}
+  else if(a==='take'){const h=tHours(tMs(k));F[k]=Math.round((F[k]+h)*100)/100;S.timer[k]={acc:0,start:null};renderSteps();toast('+'+fmt(h)+' h übernommen');}
+  else if(a==='reset'){if(b.dataset.sure){S.timer[k]={acc:0,start:null};}else{b.dataset.sure='1';b.textContent='Sicher?';setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.textContent='✕';}},2500);return;}}
+  save();renderTimers();});
+setInterval(()=>{if(S.timer.mann.start||S.timer.lader.start)renderTimers();},1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)renderTimers();});
 function renderRaufen(){
   const box=$('raufen'); box.innerHTML='';
   if(!F.raufen.length){box.innerHTML='<p class="muted" style="margin:0 0 10px">Keine Raufe – nur Stunden? Dann einfach weiter unten eintragen.</p>';}
@@ -244,6 +280,7 @@ function renderRaufen(){
       <div class="step"><span class="lab">Rundballen</span><button data-b="-1" data-i="${i}">−</button><output>${r.ballen}</output><button data-b="1" data-i="${i}">+</button></div>`;
     box.appendChild(d);
   });
+  persistDraft();
 }
 $('raufen').addEventListener('click',e=>{
   const t=e.target.closest('button'); if(!t) return; const i=+t.dataset.i;
@@ -251,6 +288,9 @@ $('raufen').addEventListener('click',e=>{
   if(t.dataset.art){F.raufen[i].art=t.dataset.art;renderRaufen();return;}
   if(t.dataset.b){F.raufen[i].ballen=Math.max(1,F.raufen[i].ballen+ +t.dataset.b);renderRaufen();}
 });
+$('f-datum').addEventListener('change',()=>{F.datum=$('f-datum').value||F.datum;persistDraft();});
+$('f-mist').addEventListener('change',()=>{F.mist=$('f-mist').checked;persistDraft();});
+$('f-notiz').addEventListener('input',()=>{F.notiz=$('f-notiz').value;persistDraft();});
 $('raufen').addEventListener('change',e=>{if(e.target.classList.contains('r-sel')){const r=F.raufen[+e.target.dataset.i];r.raufe=e.target.value;r.art=/stroh/i.test(r.raufe)?'Stroh':'Heu';renderRaufen();}});
 $('addRaufe').onclick=()=>{
   const used=F.raufen.map(r=>r.raufe); const next=S.settings.raufen.find(r=>!used.includes(r))||S.settings.raufen[0]||'Raufe';
@@ -271,9 +311,10 @@ $('save').onclick=()=>{
     S.entries.push({id:uid(),rev:1,wer:S.settings.name,datum:F.datum,raufen:F.raufen,mann:F.mann,lader:F.lader,mist:F.mist,notiz:F.notiz,storno:false,gesendet:false,erstellt:new Date().toISOString()});
     toast('Gespeichert ✓');
   }
-  save(); setForm(blank()); updateBadge();
+  S.draft=null; save(); setForm(blank()); updateBadge(); $('draftHint').classList.add('hidden');
 };
-$('cancelEdit').onclick=()=>{editId=null;setForm(blank());};
+$('cancelEdit').onclick=()=>{editId=null;setForm(blank());S.draft=null;save();};
+$('draftDrop').onclick=()=>{editId=null;S.draft=null;save();setForm(blank());$('draftHint').classList.add('hidden');toast('Entwurf verworfen');};
 
 // ---------- Liste ----------
 function raufText(e){return e.raufen.map(r=>`${r.raufe}: ${r.ballen}× ${r.art}`).join(', ');}
@@ -326,7 +367,7 @@ function buildMessage(list){
   t+='----- Daten (bitte nicht ändern) -----\n#DOSCH-REGIE v1\nid;rev;datum;mannstd;laderstd;mist;raufen;bemerkung;storno;wer\n';
   list.forEach(e=>{
     const rf=e.raufen.map(r=>`${clean(r.raufe)}:${r.art==='Heu'?'H':'S'}${r.ballen}`).join('|');
-    t+=[e.id,e.rev||1,e.datum,e.mann,e.lader,e.mist?1:0,rf,clean(e.notiz||''),e.storno?1:0,clean(e.wer||S.settings.name||'')].join(';')+'\n';
+    t+=[e.id,e.rev||1,e.datum,e.mann,e.lader,e.mist?1:0,rf,clean(e.notiz||''),e.storno?1:0,clean(e.wer||S.settings.name||'')].join(';')+';\n';
   });
   t+='#ENDE\n';
   return {subj,text:t};
@@ -382,7 +423,8 @@ function updateBadge(){
   b.textContent=n?`${n} noch nicht gesendet`:'alles gesendet';
   if(!storeOk){b.classList.remove('ok');b.textContent='Speicher gesperrt!';}
 }
-setForm(blank()); updateBadge(); renderWer();
+if(S.draft&&S.draft.F){editId=S.draft.editId&&S.entries.some(x=>x.id===S.draft.editId)?S.draft.editId:null;setForm(S.draft.F);$('draftHint').classList.toggle('hidden',isBlankF());}else setForm(blank());
+draftReady=true; updateBadge(); renderWer(); renderTimers();
 if(!PERSONEN.includes(S.settings.name)){S.settings.name='';openWer();}
 })();
 </script>
